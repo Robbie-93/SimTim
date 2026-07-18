@@ -32,8 +32,9 @@ SimTim functions as a data bridge between the simulator environment and the driv
 SimTim is packaged as a standalone executable (`.exe`), meaning you do not need Python installed on your system to run it.
 
 1. Go to the **Releases** tab on the right side of this GitHub repository.
-2. Download the latest `SimTim.exe` file.
-3. Place it in a folder of your choice.
+2. Download the latest `SimTim.zip` file.
+3. Extract the `Dist` folder in a folder of your choice. That folder will now contain `SimTim.exe` and a `data` folder.
+4. Create a shortcut or run `SimTim.exe` from that location. 
 
 > ### ⚠️ Windows SmartScreen Notice
 > Because this executable is an unsigned binary created via PyInstaller, Windows Defender SmartScreen will likely trigger a warning when you run it for the first time stating: *"Windows protected your PC"*. 
