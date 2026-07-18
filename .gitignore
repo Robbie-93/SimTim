@@ -20,3 +20,4 @@ dist/
 # offline fallback the very first time they run the app before it's ever
 # reached the internet successfully.
 # data/train_db.json
+*.zip
