@@ -1,0 +1,59 @@
+/* ==========================================================================
+   LAYOUT SKELET (De onbreekbare Grid-structuur)
+   ========================================================================== */
+
+/* Voorkom scrollbars op de hoofdinterface */
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+}
+
+/* De hoofdcontainer verdeelt het scherm verticaal */
+.grid-container {
+    display: grid;
+    grid-template-rows: auto auto 1fr auto; 
+    height: 100vh;
+    width: 100vw;
+}
+
+/* Posities in de hoofd-grid */
+#top-bar {
+    grid-row: 1;
+}
+
+#pre-bar {
+    grid-row: 2;
+}
+
+#main {
+    grid-row: 3;
+    display: flex; /* Verdeelt links en rechts */
+    height: 100%;
+    min-height: 0;
+    overflow: hidden;
+}
+
+#bottom-bar {
+    grid-row: 4;
+    height: 60px; /* Vaste hoogte */
+}
+
+/* Hoofdsectie: Links (Track) & Rechts (Timetable) */
+#track-view {
+    width: 50%;
+    height: 100%;
+}
+
+#timetable-panel {
+    width: 50%;
+    height: 100%;
+    overflow-y: auto; /* Alleen de rittenstaat mag intern scrollen */
+}
+
+#mapCanvas {
+    width: 100%;
+    height: 100%;
+}

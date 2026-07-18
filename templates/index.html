@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SimTim - Driver Support</title>
+    
+    <!-- Lucide Icons & CSS Stylesheets -->
+    <script src="https://unpkg.com/lucide@1.24.0"></script>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="/static/css/layout.css">
+    <link rel="stylesheet" href="/static/css/components.css">
+</head>
+
+<body data-theme="night">
+    <div class="grid-container">
+        
+        <!-- Top bar component -->
+        {% include 'includes/top_bar.html' %}
+                
+        <!-- Main Panel (Track + Timetable) -->
+        <div id="main">
+            {% include 'includes/main_left.html' %}
+            {% include 'includes/main_right.html' %}
+        </div>
+        
+        <!-- Bottom bar component -->
+        {% include 'includes/bottom_bar.html' %}
+        
+    </div>
+
+    <!-- Modals, Popups & Numpad overlays -->
+    {% include 'includes/modals.html' %}
+
+    <!-- Core Application Architecture -->
+    <script src="/static/js/api.js"></script>
+    <script src="/static/js/ui.js"></script>
+    <script src="/static/js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.pyc
+venv/
+.venv/
+
+# Runtime-generated - personal to each install, shouldn't be in git
+config.json
+simtim.log
+simtim.log.*
+
+# PyInstaller build output - regenerated from source, not source itself
+build/
+dist/
+*.spec
+
+# Train database cache - refreshed from the online source at every startup.
+# Uncomment the line below if you don't want to ship a baseline snapshot in
+# the repo. Leave it committed if you want new users to have a working
+# offline fallback the very first time they run the app before it's ever
+# reached the internet successfully.
+# data/train_db.json

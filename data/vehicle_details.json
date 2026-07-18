@@ -1,0 +1,459 @@
+{
+  "locomotives": {
+    "163": {
+      "name": "163",
+      "vmax": 120,
+      "service_weight": 84,
+      "max_weight": 1800,
+      "power": 3480
+    },
+    "36WEd": {
+      "name": "36WEd",
+      "vmax": 160,
+      "service_weight": 111,
+      "max_weight": null,
+      "power": 1600
+    },
+    "E186": {
+      "name": "E186",
+      "vmax": 140,
+      "service_weight": 84,
+      "max_weight": 2500,
+      "power": 5600
+    },
+    "E6ACTa": {
+      "name": "E6ACTa",
+      "vmax": 120,
+      "service_weight": 120,
+      "max_weight": 3500,
+      "power": 5000
+    },
+    "E6ACTadb": {
+      "name": "E6ACTadb",
+      "vmax": 120,
+      "service_weight": 120,
+      "max_weight": 3500,
+      "power": 5000
+    },
+    "ED250": {
+      "name": "ED250",
+      "vmax": 200,
+      "service_weight": 414,
+      "max_weight": null,
+      "power": 2000
+    },
+    "EN57": {
+      "name": "EN57",
+      "vmax": 110,
+      "service_weight": 126.5,
+      "max_weight": null,
+      "power": 580
+    },
+    "EN71": {
+      "name": "EN71",
+      "vmax": 110,
+      "service_weight": 182,
+      "max_weight": null,
+      "power": 1160
+    },
+    "EN76": {
+      "name": "EN76",
+      "vmax": 160,
+      "service_weight": 135,
+      "max_weight": null,
+      "power": 2000
+    },
+    "EN96": {
+      "name": "EN96",
+      "vmax": 160,
+      "service_weight": 83,
+      "max_weight": null,
+      "power": 1600
+    },
+    "EP07": {
+      "name": "EP07",
+      "vmax": 125,
+      "service_weight": 80,
+      "max_weight": 1800,
+      "power": 2000
+    },
+    "EP08": {
+      "name": "EP08",
+      "vmax": 140,
+      "service_weight": 80,
+      "max_weight": 1800,
+      "power": 2000
+    },
+    "ET22": {
+      "name": "ET22",
+      "vmax": 125,
+      "service_weight": 120,
+      "max_weight": 3125,
+      "power": 3000
+    },
+    "ET25": {
+      "name": "ET25",
+      "vmax": 120,
+      "service_weight": 120,
+      "max_weight": 3500,
+      "power": 5000
+    },
+    "EU07": {
+      "name": "EU07",
+      "vmax": 125,
+      "service_weight": 80,
+      "max_weight": 1800,
+      "power": 2000
+    },
+    "Ty2-347": {
+      "name": "Ty2-347",
+      "vmax": 80,
+      "service_weight": 98.05,
+      "max_weight": null,
+      "power": 1200
+    }
+  },
+  "wagons": {
+    "111A_50 51 20-00 608-3 Variant": {
+      "base_type": "11xa",
+      "wiki_name": "111Ah",
+      "vmax": 120,
+      "length": 24.5,
+      "service_weight": 40,
+      "railway_company": "PKP Intercity"
+    },
+    "111A_50 51 20-08 607-7 Variant": {
+      "base_type": "11xa",
+      "wiki_name": "111Aw",
+      "vmax": 120,
+      "length": 24.5,
+      "service_weight": 40,
+      "railway_company": "PKP Intercity"
+    },
+    "111A_51 51 20-70 829-9 Variant": {
+      "base_type": "11xa",
+      "wiki_name": "111Ah",
+      "vmax": 160,
+      "length": 24.5,
+      "service_weight": 40,
+      "railway_company": "PKP Intercity"
+    },
+    "111A_51 51 20-71 102-0 Variant": {
+      "base_type": "11xa",
+      "wiki_name": "111Au",
+      "vmax": 160,
+      "length": 24.5,
+      "service_weight": 40,
+      "railway_company": "PKP Intercity"
+    },
+    "112A_50 51 19-00 189-7 Variant": {
+      "base_type": "11xa",
+      "wiki_name": "112Ag",
+      "vmax": 120,
+      "length": 24.5,
+      "service_weight": 40,
+      "railway_company": "PKP Intercity"
+    },
+    "112A_50 51 19-08 095-8 Variant": {
+      "base_type": "11xa",
+      "wiki_name": "112Am",
+      "vmax": 160,
+      "length": 24.5,
+      "service_weight": 40,
+      "railway_company": "PKP Intercity"
+    },
+    "112A_50 51 19-08 136-0 Variant": {
+      "base_type": "11xa",
+      "wiki_name": "112Ag",
+      "vmax": 120,
+      "length": 24.5,
+      "service_weight": 40,
+      "railway_company": "PKP Intercity"
+    },
+    "112A_51 51 19-70 003-4 Variant": {
+      "base_type": "11xa",
+      "wiki_name": "112Ag",
+      "vmax": 160,
+      "length": 24.5,
+      "service_weight": 40,
+      "railway_company": "PKP Intercity"
+    },
+    "230-01_31514508558-7": {
+      "base_type": "629Z",
+      "wiki_name": "Sgmmns-x",
+      "vmax_unloaded": 120,
+      "vmax_loaded": 100,
+      "length": 14,
+      "service_weight": 16.5,
+      "railway_company": null
+    },
+    "406Ra_33510079375-1": {
+      "base_type": "406Ra",
+      "wiki_name": "Zaes",
+      "vmax": 100,
+      "length": 12,
+      "service_weight": 23,
+      "railway_company": null
+    },
+    "406Ra_33517881520-5": {
+      "base_type": "406Ra",
+      "wiki_name": "Zaes",
+      "vmax": 100,
+      "length": 12,
+      "service_weight": 23,
+      "railway_company": "PKP | TANKPOL LOGISTICS"
+    },
+    "406Ra_33517980031-3": {
+      "base_type": "406Ra",
+      "wiki_name": "Zaes",
+      "vmax": 100,
+      "length": 12,
+      "service_weight": 23,
+      "railway_company": "PKP | DEC Poland Tekpro"
+    },
+    "406Ra_33517982861-1": {
+      "base_type": "406Ra",
+      "wiki_name": "Zaes",
+      "vmax": 100,
+      "length": 12,
+      "service_weight": 23,
+      "railway_company": "GATX Rail Poland"
+    },
+    "406Ra_34517981215-0": {
+      "base_type": "406Ra",
+      "wiki_name": "Zaes",
+      "vmax": 100,
+      "length": 12,
+      "service_weight": 23,
+      "railway_company": "GATX Rail Poland"
+    },
+    "406Rb_84517862699-8": {
+      "base_type": "406Ra",
+      "wiki_name": "Zas",
+      "vmax": 100,
+      "length": 12,
+      "service_weight": 23,
+      "railway_company": "PKP | DEC Poland Tekpro"
+    },
+    "408S": {
+      "base_type": "408S",
+      "wiki_name": "Uacs",
+      "vmax": 120,
+      "length": 14,
+      "service_weight": 24.5,
+      "railway_company": "CEMET"
+    },
+    "412W_33515356394-5": {
+      "base_type": "412W",
+      "wiki_name": "Eaos",
+      "vmax": 100,
+      "length": 14,
+      "service_weight": 20,
+      "railway_company": "PROTOR | DB CARGO Polska"
+    },
+    "412W_33565300118-0": {
+      "base_type": "412W",
+      "wiki_name": "Eaos",
+      "vmax": 100,
+      "length": 14,
+      "service_weight": 20,
+      "railway_company": "ZOS ZVOLEN"
+    },
+    "412W_33565300177-6": {
+      "base_type": "412W",
+      "wiki_name": "Eaos",
+      "vmax": 100,
+      "length": 14,
+      "service_weight": 20,
+      "railway_company": "ZOS ZVOLEN"
+    },
+    "412W_v4_364-9 Variant": {
+      "base_type": "412W",
+      "wiki_name": "Eaos",
+      "vmax": 100,
+      "length": 14,
+      "service_weight": 20,
+      "railway_company": "PKP Cargo"
+    },
+    "412W_v4_364-9_b Variant": {
+      "base_type": "412W",
+      "wiki_name": "Eaos",
+      "vmax": 100,
+      "length": 14,
+      "service_weight": 20,
+      "railway_company": "PKP Cargo"
+    },
+    "424Z": {
+      "base_type": "424Z",
+      "wiki_name": "Res",
+      "vmax": 120,
+      "length": 14,
+      "service_weight": 20,
+      "railway_company": "PKP Cargo"
+    },
+    "424Z_brazowy": {
+      "base_type": "424Z",
+      "wiki_name": "Res",
+      "vmax": 120,
+      "length": 14,
+      "service_weight": 20,
+      "railway_company": "PKP Cargo"
+    },
+    "434Z_31514553133-5": {
+      "base_type": "629Z",
+      "wiki_name": "Sgns(s)",
+      "vmax": 120,
+      "length": 20,
+      "service_weight": 18.87,
+      "railway_company": null
+    },
+    "441V_31516635283-3": {
+      "base_type": "441V",
+      "wiki_name": "Falns",
+      "vmax": 120,
+      "length": 14,
+      "service_weight": 26,
+      "railway_company": "PKP Cargo"
+    },
+    "441V_31516635512-5": {
+      "base_type": "441V",
+      "wiki_name": "Falns",
+      "vmax": 120,
+      "length": 14,
+      "service_weight": 26,
+      "railway_company": "PKP Cargo"
+    },
+    "629Z_31514960133-0": {
+      "base_type": "629Z",
+      "wiki_name": "Sggrss",
+      "vmax": 120,
+      "length": 27,
+      "service_weight": 27,
+      "railway_company": null
+    },
+    "80s/110Ac_50 51 59-78 003-8 Variant": {
+      "base_type": "11xa",
+      "wiki_name": "110Ac",
+      "vmax": 160,
+      "length": 24.5,
+      "service_weight": 40,
+      "railway_company": "PKP Intercity"
+    },
+    "80s/110Ac_51 51 59-70 048-0 Variant 80s": {
+      "base_type": "11xa",
+      "wiki_name": "110Ac",
+      "vmax": 160,
+      "length": 24.5,
+      "service_weight": 40,
+      "railway_company": "PKP Intercity"
+    },
+    "80s/111A_50 51 20-08 607-7 Variant 80s": {
+      "base_type": "11xa",
+      "wiki_name": "111A",
+      "vmax": 120,
+      "length": 24.5,
+      "service_weight": 40,
+      "railway_company": null
+    },
+    "80s/112A_50 51 19-00 189-7 Variant 80s": {
+      "base_type": "11xa",
+      "wiki_name": "110Ac",
+      "vmax": 120,
+      "length": 24.5,
+      "service_weight": 40,
+      "railway_company": "PKP"
+    },
+    "a9emnouz_61511970214-5": {
+      "base_type": "Z2",
+      "wiki_name": "A9mnouz | B91",
+      "vmax": 160,
+      "length": 26.4,
+      "service_weight": 44,
+      "railway_company": "PKP Intercity"
+    },
+    "a9mnouz_61511970234-3": {
+      "base_type": "Z2",
+      "wiki_name": "B91 | A9mnouz",
+      "vmax": 160,
+      "length": 26.4,
+      "service_weight": 44,
+      "railway_company": "PKP Intercity"
+    },
+    "b10bmnouz_61512071105_1": {
+      "base_type": "Z2",
+      "wiki_name": "G90 | B10bmnouz",
+      "vmax": 160,
+      "length": 26.4,
+      "service_weight": 46,
+      "railway_company": "PKP Intercity"
+    },
+    "b11gmnouz_61512170107-7": {
+      "base_type": "Z2",
+      "wiki_name": "B91 | B11gmnouz",
+      "vmax": 160,
+      "length": 26.4,
+      "service_weight": 46,
+      "railway_company": "PKP Intercity"
+    },
+    "b11mnouz_61512170064-0": {
+      "base_type": "Z2",
+      "wiki_name": "B91 | B11bmnouz",
+      "vmax": 160,
+      "length": 26.4,
+      "service_weight": 47,
+      "railway_company": "PKP Intercity"
+    },
+    "b11mnouz_61512170098-8": {
+      "base_type": "Z2",
+      "wiki_name": "B91 | B11bmnouz",
+      "vmax": 160,
+      "length": 26.4,
+      "service_weight": 46,
+      "railway_company": "PKP Intercity"
+    },
+    "wrmnouz_61518870191_1": {
+      "base_type": "Z2",
+      "wiki_name": "406A | WRmnouz",
+      "vmax": 160,
+      "length": 26.4,
+      "service_weight": 46,
+      "railway_company": "PKP Intercity"
+    }
+  },
+  "cargo": {
+    "Ballast": "ballast",
+    "Coal": "coal",
+    "Concrete_slab": "concrete slabs",
+    "Crude_Oil": "crude oil",
+    "Ethanol": "ethanol",
+    "GasContainer1x20": "liquefied gas",
+    "GasContainer2x20": "liquefied gas",
+    "GasContainer2x40": "liquefied gas",
+    "GasContainer3x20": "liquefied gas",
+    "GasContainer4x20": "liquefied gas",
+    "Gas_pipeline": "gas pipelines",
+    "Heating_Oil": "heating oil",
+    "Petrol": "petrol",
+    "Pipeline": "pipelines",
+    "RandomContainer1x20": "containers",
+    "RandomContainer1x40": "containers",
+    "RandomContainer202040": "containers",
+    "RandomContainer2040": "containers",
+    "RandomContainer2x20": "containers",
+    "RandomContainer2x40": "containers",
+    "RandomContainer3x20": "containers",
+    "RandomContainer402020": "containers",
+    "RandomContainer402020 ": "containers",
+    "RandomContainer4x20": "containers",
+    "RandomContainerAll": "containers",
+    "Sand": "sand",
+    "Sheet_metal": "steel sheets",
+    "Steel_circle": "steel coils",
+    "T-beam": "steel beams",
+    "Tie": "ties / sleepers",
+    "Tree_trunk": "trunks",
+    "WoodLogs": "logs",
+    "Wooden_beam": "wooden beams",
+    "undefined": "undefined"
+  }
+}

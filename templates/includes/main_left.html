@@ -1,0 +1,24 @@
+<div id="track-view">
+    <div class="map-nav-bar">
+        <button id="btn-map-zoom-in" class="nav-btn" title="Zoom In (3 km)">
+            <i data-lucide="circle-plus"></i>
+        </button>
+        
+        <button id="btn-map-zoom-reset" class="nav-btn" title="Reset Zoom (5 km)">
+            <i data-lucide="rotate-ccw"></i>
+        </button>
+        
+        <button id="btn-map-zoom-out" class="nav-btn" title="Zoom Out (7 km / 10 km)">
+            <i data-lucide="circle-minus"></i>
+        </button>
+
+        <div class="map-range-wrapper">
+            <span class="map-range-label">RANGE</span>
+            <div id="map-range-val">5 km</div>
+        </div>
+    </div>
+
+    <div class="canvas-container">
+        <canvas id="mapCanvas"></canvas>
+    </div>
+</div>

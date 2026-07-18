@@ -1,0 +1,42 @@
+<!-- =================== CMD SCREEN ========== -->
+<div id="cmd-overlay">
+    <div class="cmd-container">
+        <div id="cmd-header">
+            <span>SimTim - Simrail Driver Assistant - v1.0</span>
+            <span class="cmd-close-x" onclick="closeCMD()">X</span>
+        </div>
+        <div id="cmd-log">
+        </div>
+        <div id="cmd-footer">
+            <button onclick="closeCMD()">ACKNOWLEDGE</button>
+        </div>
+    </div>
+</div>
+
+<!-- =============== CONNECTION POPUP ================= -->
+<div id="status-modal" style="display:none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.8);">
+    <div style="width: 300px; margin: 15% auto; padding: 20px; border: 2px solid var(--accent-color); background: #1a1a1a;">
+        <h3 style="margin-top: 0; font-family: monospace; color: #eee;">API STATUS</h3>
+        <hr style="border: 0; border-top: 1px solid #444; margin: 10px 0;">
+        <div id="status-details" style="font-family: 'Courier New', monospace; font-size: 14px; line-height: 1.6;"></div>
+        <button onclick="closeStatusModal()" style="margin-top: 20px; width: 100%; padding: 10px; background: #333; color: white; border: 1px solid #555; cursor: pointer; font-family: monospace;">CLOSE</button>
+    </div>
+</div>
+
+<!-- ================== NUMPAD ================== -->
+<div id="numpad">
+    <div class="num-grid">
+        <button onclick="addNum(1)">1</button>
+        <button onclick="addNum(2)">2</button>
+        <button onclick="addNum(3)">3</button>
+        <button onclick="addNum(4)">4</button>
+        <button onclick="addNum(5)">5</button>
+        <button onclick="addNum(6)">6</button>
+        <button onclick="addNum(7)">7</button>
+        <button onclick="addNum(8)">8</button>
+        <button onclick="addNum(9)">9</button>
+        <button onclick="clearNum()">C</button>
+        <button onclick="addNum(0)">0</button>
+        <button onclick="confirmNum()">OK</button>
+    </div>
+</div>

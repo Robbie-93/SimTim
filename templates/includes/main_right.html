@@ -1,0 +1,52 @@
+<div id="timetable-panel">
+    <div id="timetable-body">
+        
+        <div id="view-timetable" style="display: flex; flex-direction: column; flex-grow: 1; overflow: hidden;">
+        
+            <div class="timetable-header">
+                <div class="table-headers">
+                    <span class="tt-col-point">Timetable point</span>
+                    <span class="tt-col-arrival">Arrival</span>
+                    <span class="tt-col-depart">Departure</span>
+                    <span class="tt-col-type">Type</span>
+                    <span class="tt-col-duration">Stop</span>
+                </div>
+            </div>
+
+            <div class="timetable-scroll-area" id="timetable-scroll-area">
+            </div>
+        </div>
+   
+        <!-- View 2: Info -->
+        <div id="view-info" style="display: none; flex-direction: column; height: 100%; color: #fff;">
+
+            <div class="timetable-header">
+                <div class="table-headers">
+                    <span>TRAIN INFORMATION DISPLAY</span>
+                </div>
+            </div>
+
+            <div id="info-scroll-area">
+            </div>
+        </div>
+
+        <div class="timetable-nav-bar">
+            <button id="btn-tt-info" class="nav-btn" title="Train information">
+                <i data-lucide="info"></i>
+            </button>
+            <button id="btn-tt-view" class="nav-btn" title="timetable-view">
+                <i data-lucide="list-chevrons-up-down"></i>
+            </button>
+            <button id="btn-tt-up" class="nav-btn" title="Scroll up">
+                <i data-lucide="chevron-up"></i>
+            </button>
+            <button id="btn-tt-center" class="nav-btn active-lock" title="Reset to current point">
+                <i data-lucide="list-indent-increase"></i>
+            </button>
+            <button id="btn-tt-down" class="nav-btn" title="Scroll down">
+                <i data-lucide="chevron-down"></i>
+            </button>
+        </div>
+
+    </div>
+</div>

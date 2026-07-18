@@ -1,0 +1,27 @@
+<div id="top-bar">
+    <!-- LEFT: SERVER -->
+    <div class="box" id="top-left">
+        <select id="server" class="server-select"></select> 
+    </div>
+
+    <!-- CENTER: TRAIN -->
+    <div class="box" onclick="handleTrainClick()" style="cursor:pointer">
+        <div id="train-label" class="train-main">Select service</div>
+        <div id="train-type" class="train-sub hidden"></div>
+    </div>
+
+    <!-- RIGHT: ROUTE & INDICATOR -->
+    <div class="box" id="top-right" style="flex-direction: row; gap: 10px;">
+        <span id="route-id">-</span>
+    </div>
+
+    <!-- THEME & STATUS -->
+    <div class="box" id="top-theme" style="flex-direction: row;">
+        <button id="theme-btn" onclick="toggleTheme()" style="background:none; border:none; color:inherit; cursor:pointer; padding:0;">
+            <i data-lucide="eclipse" class="topbar-icon"></i>
+        </button>
+        <div id="conn-indicator">
+            <i data-lucide="wifi" class="topbar-icon" style="color:inherit"></i>
+        </div>
+    </div>
+</div>

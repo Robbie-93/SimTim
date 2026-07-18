@@ -1,0 +1,4122 @@
+{
+    "Warszawa Gł.Tow. WOA": {
+        "radio": "R2",
+        "manual_override": true
+    },
+    "Warszawa Gł.Tow.Sr18": {
+        "radio": "R2",
+        "manual_override": true
+    },
+    "Józefinów": {
+        "radio": "R2",
+        "manual_override": false
+    },
+    "Pruszków": {
+        "radio": "R2",
+        "manual_override": false
+    },
+    "Parzniew": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Brwinów": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Milanówek": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Grodzisk Mazowiecki": {
+        "radio": "R2",
+        "manual_override": false
+    },
+    "Grodzisk Maz. R58": {
+        "radio": "",
+        "supervisedBy": "Grodzisk Mazowiecki",
+        "manual_override": false
+    },
+    "Korytów": {
+        "radio": "R1",
+        "manual_override": false
+    },
+    "Szeligi": {
+        "radio": "R1",
+        "manual_override": false
+    },
+    "Biała Rawska": {
+        "radio": "R1",
+        "manual_override": false
+    },
+    "Strzałki": {
+        "radio": "R1",
+        "manual_override": false
+    },
+    "Idzikowice Roz.12": {
+        "radio": "",
+        "supervisedBy": "Idzikowice",
+        "manual_override": false
+    },
+    "Idzikowice Roz.18": {
+        "radio": "",
+        "supervisedBy": "Idzikowice",
+        "manual_override": false
+    },
+    "Idzikowice": {
+        "radio": "R1",
+        "manual_override": false
+    },
+    "Opoczno Południe": {
+        "radio": "R1",
+        "manual_override": false
+    },
+    "Pilichowice": {
+        "radio": "R1",
+        "manual_override": false
+    },
+    "Olszamowice": {
+        "radio": "R1",
+        "manual_override": false
+    },
+    "Włoszczowa Północ": {
+        "radio": "R1",
+        "manual_override": false
+    },
+    "Knapówka R2": {
+        "radio": "",
+        "supervisedBy": "Knapówka",
+        "manual_override": false
+    },
+    "Knapówka": {
+        "radio": "R1",
+        "manual_override": false
+    },
+    "Psary": {
+        "radio": "R1",
+        "manual_override": false
+    },
+    "Psary Roz.40": {
+        "radio": "",
+        "supervisedBy": "Psary",
+        "manual_override": false
+    },
+    "Starzyny": {
+        "radio": "R5",
+        "manual_override": true
+    },
+    "Starzyny R5": {
+        "radio": "",
+        "supervisedBy": "Starzyny",
+        "manual_override": false
+    },
+    "Sprowa": {
+        "radio": "R5",
+        "manual_override": false
+    },
+    "Kozłów": {
+        "radio": "R4",
+        "manual_override": false
+    },
+    "Tunel": {
+        "radio": "R1, R4",
+        "manual_override": true
+    },
+    "Tunel R13": {
+        "radio": "",
+        "supervisedBy": "Tunel",
+        "manual_override": false
+    },
+    "Dziadówki": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Miechów": {
+        "radio": "R1",
+        "manual_override": false
+    },
+    "Kamieńczyce": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Szczepanowice": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Smroków": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Słomniki": {
+        "radio": "R1",
+        "manual_override": true
+    },
+    "Słomniki Miasto": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Niedźwiedź": {
+        "radio": "R1",
+        "manual_override": true
+    },
+    "Goszcza": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Łuczyce": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Baranówka": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Zastów": {
+        "radio": "R1",
+        "manual_override": true
+    },
+    "Raciborowice": {
+        "radio": "R1",
+        "manual_override": true
+    },
+    "Dłubnia R2": {
+        "radio": "",
+        "supervisedBy": "Dłubnia",
+        "manual_override": false
+    },
+    "Dłubnia": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Kraków Nowa Huta Nha": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Kraków Nowa Huta NHA GTTR": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Radom": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Radom Południowy": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Rożki": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Ruda Wielka": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Wola Lipieniecka": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Jastrząb": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Gąsawy Plebańskie": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Szydłowiec": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Lipowe Pole": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Skarżysko-Kam. Ska": {
+        "radio": "",
+        "supervisedBy": "Skarżysko-Kamienna",
+        "manual_override": false
+    },
+    "Skarżysko-Kamienna PZS R154": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Skarżysko-Kamienna": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Skarżysko Zachodnie": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Suchedniów Północny": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Suchedniów": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Berezów": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Łączna": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Ostojow": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Lekomin": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Zagnańsk": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Tumlin": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Kostomłoty": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Piaski koło Kielc": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Kielce Piaski": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Kielce": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Kielce Białogon": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Kielce Słowik": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Sitkówka Nowiny": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Radkowice": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Wolica": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Sobków": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Miąsowa": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Podchojny": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Jędrzejów": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Potok": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Krzcięcice": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Sędziszów Towarowy": {
+        "radio": "R4",
+        "manual_override": true
+    },
+    "Sędziszów": {
+        "radio": "R4",
+        "manual_override": true
+    },
+    "Gniewiecin": {
+        "radio": "R4",
+        "manual_override": true
+    },
+    "Klimontów": {
+        "radio": "R4",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Charsznica": {
+        "radio": "R4",
+        "manual_override": true
+    },
+    "Gajówka": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Gajówka APO": {
+        "radio": "R4",
+        "manual_override": true
+    },
+    "Jeżówka": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Wolbrom": {
+        "radio": "R4",
+        "manual_override": true
+    },
+    "Zarzecze": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Zarzecze APO": {
+        "radio": "R4",
+        "manual_override": true
+    },
+    "Chrząstowice Olkuskie": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Jaroszowiec Olkuski": {
+        "radio": "R4",
+        "manual_override": true
+    },
+    "Olkusz": {
+        "radio": "R4",
+        "manual_override": false
+    },
+    "Bukowno": {
+        "radio": "R4",
+        "manual_override": false
+    },
+    "Bukowno Przymiarki": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Sławków": {
+        "radio": "R4",
+        "manual_override": false
+    },
+    "Dąbrowa Górnicza Wschodnia": {
+        "radio": "R3, R4",
+        "manual_override": true
+    },
+    "Dorota": {
+        "radio": "R3",
+        "manual_override": false
+    },
+    "Juliusz": {
+        "radio": "R5",
+        "manual_override": false
+    },
+    "Sosnowiec Dańdówka": {
+        "radio": "R5",
+        "manual_override": false
+    },
+    "Stawiska": {
+        "radio": "R5",
+        "manual_override": false
+    },
+    "Katowice Janów": {
+        "radio": "R5",
+        "manual_override": false
+    },
+    "Katowice M. Roz. 233": {
+        "radio": "R5",
+        "supervisedBy": "Katowice Much. KMB",
+        "manual_override": false
+    },
+    "Katowice M. Kmb R234": {
+        "radio": "R5",
+        "supervisedBy": "Katowice Much. KMB",
+        "manual_override": false
+    },
+    "Katowice Much. KMB": {
+        "radio": "R5",
+        "manual_override": false
+    },
+    "Staszic": {
+        "radio": "R5, R7",
+        "manual_override": false
+    },
+    "Katowice Kostuchna": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Mąkołowiec": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Tychy": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Warszawa Grochów": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Warszawa Grochów R5": {
+        "radio": "",
+        "supervisedBy": "Warszawa Grochów",
+        "manual_override": false
+    },
+    "Warszawa Wsch. R.58": {
+        "radio": "",
+        "supervisedBy": "Warszawa Wschodnia",
+        "manual_override": false
+    },
+    "Warszawa Wsch.R.34": {
+        "radio": "",
+        "supervisedBy": "Warszawa Wschodnia",
+        "manual_override": false
+    },
+    "Warszawa Wschodnia": {
+        "radio": "R2",
+        "manual_override": true
+    },
+    "Warszawa Centralna": {
+        "radio": "R2",
+        "manual_override": true
+    },
+    "Warszawa Zachodnia": {
+        "radio": "R2, R3, R5",
+        "manual_override": false
+    },
+    "Warszawa Włochy": {
+        "radio": "R2",
+        "manual_override": false
+    },
+    "Góra Włodowska": {
+        "radio": "R1",
+        "manual_override": false
+    },
+    "Zawiercie": {
+        "radio": "R1, R2",
+        "manual_override": true
+    },
+    "Łazy Ła": {
+        "radio": "R2",
+        "manual_override": true
+    },
+    "Łazy": {
+        "radio": "R2",
+        "manual_override": false
+    },
+    "Łazy Łc": {
+        "radio": "R2",
+        "manual_override": true
+    },
+    "Dąbrowa Górnicza Ząbkowice DZA": {
+        "radio": "",
+        "supervisedBy": "Dąbrowa Górnicza Ząbkowice",
+        "manual_override": false
+    },
+    "Dąbrowa Górnicza Ząbkowice": {
+        "radio": "R2",
+        "manual_override": false
+    },
+    "Dąbrowa Górnicza": {
+        "radio": "R2",
+        "manual_override": false
+    },
+    "Będzin": {
+        "radio": "R2",
+        "manual_override": false
+    },
+    "Sosnowiec Główny": {
+        "radio": "R2",
+        "manual_override": false
+    },
+    "Sosnowiec Gł. pzs R52": {
+        "radio": "",
+        "supervisedBy": "Sosnowiec Główny",
+        "manual_override": false
+    },
+    "Katowice Zawodzie": {
+        "radio": "R2, R7",
+        "manual_override": true
+    },
+    "Katowice": {
+        "radio": "R2, R3, R7",
+        "manual_override": false
+    },
+    "Brynów": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Katowice Ligota": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Kobiór": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Pszczyna": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Most Wisła": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Czechowice-Dziedzice": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Czechowice-Dziedzice Południowe": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Bielsko-Biała Główna": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Kraków Batowice": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Kraków Przedmieście": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Kraków Główny": {
+        "radio": "R1",
+        "manual_override": true
+    },
+    "Kr.Płaszów pzs KPA": {
+        "radio": "",
+        "supervisedBy": "Kraków Płaszów",
+        "manual_override": false
+    },
+    "Kraków Płaszów": {
+        "radio": "R1",
+        "manual_override": true
+    },
+    "Warszawa Zach. R19": {
+        "radio": "",
+        "supervisedBy": "Warszawa Zachodnia",
+        "manual_override": false
+    },
+    "Gliwice": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Zabrze": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Ruda Chebzie": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Chorzów Batory": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Katowice Tow. KTC": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Warszawa Praga WPT M": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Warszawa Praga PZS R15": {
+        "radio": "",
+        "supervisedBy": "Warszawa Praga WPT M",
+        "manual_override": false
+    },
+    "Warszawa Praga WPT C": {
+        "radio": "",
+        "supervisedBy": "Warszawa Praga",
+        "manual_override": false
+    },
+    "Legionowo": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Nowy Dwór Mazowiecki GT": {
+        "radio": "",
+        "supervisedBy": "Nowy Dwór Mazowiecki",
+        "manual_override": false
+    },
+    "Nowy Dwór Mazowiecki": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Modlin": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Nasielsk": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Świercze": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Gąsocin": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Ciechanów": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Konopki": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Mława": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Iłowo": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Działdowo": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Gralewo": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Rybno Pomorskie": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Montowo": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Zajączkowo Lubawskie": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Rakowice": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Iława Główna PZS R1-R2": {
+        "radio": "",
+        "supervisedBy": "Iława Główna",
+        "manual_override": false
+    },
+    "Iława Główna": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Redaki": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Susz": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Prabuty": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Mleczewo": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Malbork Grupa Tranzytowa": {
+        "radio": "",
+        "supervisedBy": "Malbork",
+        "manual_override": false
+    },
+    "Malbork": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Szymankowo": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Tczew PZS R11": {
+        "radio": "",
+        "supervisedBy": "Tczew",
+        "manual_override": false
+    },
+    "Tczew": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Pszczółki": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Pruszcz Gdański": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Pruszcz Gdański PZS R73-75": {
+        "radio": "",
+        "supervisedBy": "Pruszcz Gdański",
+        "manual_override": false
+    },
+    "Gdańsk Południowy": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Gdańsk Główny PZS R7-R510": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Gdańsk Główny": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Gdańsk Wrzeszcz": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Gdańsk Wrzeszcz Grupa Tranzytowa": {
+        "radio": "",
+        "supervisedBy": "Gdańsk Wrzeszcz",
+        "manual_override": false
+    },
+    "Gdańsk Oliwa": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Sopot Grupa Tranzytowa": {
+        "radio": "",
+        "supervisedBy": "Sopot",
+        "manual_override": false
+    },
+    "Sopot": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Gdynia Orłowo": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Gdynia Główna": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Chałupki": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Olza Olb": {
+        "radio": "",
+        "supervisedBy": "Olza",
+        "manual_override": false
+    },
+    "Olza": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Wodzisław Śląski": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Radlin Obszary": {
+        "radio": "R0",
+        "manual_override": false
+    },
+    "Rybnik Towarowy": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Rybnik Towarowy pzs RTB11": {
+        "radio": "",
+        "supervisedBy": "Rybnik Towarowy",
+        "manual_override": false
+    },
+    "Rybnik": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Kamień": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Leszczyny": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Czerwionka PZS R20": {
+        "radio": "R0",
+        "supervisedBy": "Czerwionka",
+        "manual_override": false
+    },
+    "Czerwionka": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Orzesze Jaśkowice": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Łaziska Średnie": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Gdynia Gł. Roz.84": {
+        "radio": "",
+        "supervisedBy": "Gdynia Główna",
+        "manual_override": false
+    },
+    "Gdynia Postojowa": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Częstochowa": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Częstochowa Towarowa": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Częstochowa Raków": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Poraj": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Żarki-Letnisko": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Myszków": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Myszków GT": {
+        "radio": "",
+        "supervisedBy": "Myszków",
+        "manual_override": false
+    },
+    "Dąbrowa Górnicza Gołonóg": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Będzin Ksawera": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Będzin Miasto": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Katowice Szopienice Południowe": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Katowice Brynów": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Katowice Piotrowice": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Katowice Podlesie": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Tychy Zachodnie": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Tychy Aleja Bielska": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Tychy Grota Roweckiego": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Tychy Miasto": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Tychy Lodowisko": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Korwinów": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Masłońskie Natalin": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Myszków Nowa Wieś": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Myszków Światowit": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Myszków Mrzygłód": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Zawiercie Borowe Pole": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Wiesiółka": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Chruszczobród": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Dąbrowa Górnicza Sikorka": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Dąbrowa Górnicza Pogoria": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Katowice Załęże": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Świętochłowice": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Ruda Śląska": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Sosnowiec Południowy": {
+        "radio": "R5",
+        "manual_override": true
+    },
+    "Sosnowiec Porąbka": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Sosnowiec Kazimierz PZS SKZ2": {
+        "radio": "",
+        "supervisedBy": "Sosnowiec Kazimierz",
+        "manual_override": false
+    },
+    "Sosnowiec Kazimierz": {
+        "radio": "R4",
+        "manual_override": false
+    },
+    "Dąbrowa Górnicza Strzemieszyce": {
+        "radio": "R4",
+        "manual_override": false
+    },
+    "Dąbrowa Górnicza Południowa": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Dąbrowa Górnicza Huta Katowice": {
+        "radio": "R3",
+        "manual_override": false
+    },
+    "Dąbrowa Górnicza Ząbkowice GTB": {
+        "radio": "",
+        "supervisedBy": "Dąbrowa Górnicza Ząbkowice",
+        "manual_override": false
+    },
+    "Czarnca ": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Czarnca": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Włoszczowa": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Ludynia": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Małogoszcz PZS R35": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Małogoszcz": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Rykoszyn": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Szczukowice": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Górki Szczukowskie": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Kielce Herbskie Khb": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Kielce Herbskie Kha": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Kielce Herbskie": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Radom Wschodni": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Jedlnia-Letnisko": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Pionki Zachodnie": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Pionki": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Żytkowice": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Garbatka-Letnisko": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Bąkowiec": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Zajezierze koło Dęblina": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Wisła": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Wieprz": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Zarzeka": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Puławy Azoty": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Puławy Miasto": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Puławy": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Klementowice": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Nałęczów": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Sadurki": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Motycz": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Lublin Zachodni": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Lublin": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Żelisławice": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Koniecpol": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Podlesie": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Julianka": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Lusławice": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Turów": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Kucelinka": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Częstochowa Stradom": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Częstochowa Gnaszyn": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Blachownia": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Herby Stare": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Liswarta": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Lisów": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Kochanowice": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Jawornica": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Lubliniec": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Pawonków": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Pludry": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Fosowskie": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Ozimek": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Chrząstowice": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Bolko": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Opole Główne": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Opole Zachodnie": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Dąbrowa Niemodlińska": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Lewin Brzeski": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Brzeg": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Oława": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Święta Katarzyna": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Wrocław Brochów PODG": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Wrocław Główny Wgb": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Wrocław Główny": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Grabiszyn": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Wrocław Świebodzki": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Wrocław Zachodni": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Smolec": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Kąty Wrocławskie": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Imbramowice": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Żarów": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Jaworzyna Śląska": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Świebodzice": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Wałbrzych Szczawienko": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Wałbrzych Miasto": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Wałbrzych Fabryczny": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Wałbrzych Główny": {
+        "radio": "",
+        "manual_override": false
+    },
+    "Boguszów-Gorce Wschód": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Boguszów-Gorce": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Boguszów-Gorce Zachód": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Sędzisław": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Marciszów": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Janowice Wielkie": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Wojanów": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Jelenia Góra": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Opole Groszowice": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Przywory Opolskie": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Górażdże": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Gogolin": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Jasiona": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Zdzieszowice": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Raszowa": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Kłodnica": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Kędzierzyn-Koźle": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Nowa Wieś": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Sławięcice": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Rudziniec Gliwicki": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Kanał": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Toszek Północ": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Czarków": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Krupski Młyn": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Droniowiczki": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Zakopane": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Poronin": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Biały Dunajec": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Szaflary": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Nowy Targ": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Lasek": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Sieniawa": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Raba Wyżna": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Jordanów": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Osielec": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Maków Podhalański": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Sucha Beskidzka Południe PZS": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Sucha Beskidzka Zamek": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Sucha Beskidzka Północ PZS": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Stryszów": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Stronie": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Kalwaria Zebrzydowska Lanckorona": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Leńcze": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Radziszów": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Skawina": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Kraków Bonarka": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Kraków Zabłocie": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Kraków Podgórze": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Skierniewice": {
+        "radio": "R2, R4",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Skierniewice GT 201-208": {
+        "radio": "",
+        "supervisedBy": "Skierniewice",
+        "manual_override": false
+    },
+    "Skierniewice M PZS": {
+        "radio": "",
+        "supervisedBy": "Skierniewice",
+        "manual_override": false
+    },
+    "Skierniewice Rawka": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Radziwiłłów Mazowiecki": {
+        "radio": "R2",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Jesionka": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Sucha Żyrardowska": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Żyrardów": {
+        "radio": "R2",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Międzyborów": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Jaktorów": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Grodzisk Mazowiecki R64": {
+        "radio": "",
+        "supervisedBy": "Grodzisk Mazowiecki",
+        "manual_override": false
+    },
+    "Piastów": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Warszawa Ursus Niedźwiadek": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Warszawa Ursus": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Warszawa Ochota": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Warszawa Śródmieście": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Warszawa Powiśle": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Warszawa Stadion": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Ożarów Mazowiecki": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Warszawa Gołąbki": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Warszawa Ursus Północny": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Warszawa Podskarbińska": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Warszawa Rembertów": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Warszawa Mokry Ług": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Zielonka Bankowa": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Zielonka": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "KATOWICE MUCHOWIEC STASZIC": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Jaworzno Szczakowa": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Sosnowiec Maczki": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Radzice": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Dęba Opoczyńska": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Antoniów": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Tomaszów Mazowiecki Białobrzegi": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Tomaszów Mazowiecki": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Skrzynki": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Zaosie": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Wykno": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Mikołajów": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Żakowice Płd Roz.5": {
+        "radio": "",
+        "supervisedBy": "Żakowice Południowe",
+        "manual_override": false
+    },
+    "Żakowice Południowe": {
+        "radio": "R7",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Gałkówek": {
+        "radio": "R5, R7",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Justynów": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Bedoń": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Łódź Olechów Łoc": {
+        "radio": "",
+        "supervisedBy": "Łódź Olechów",
+        "manual_override": false
+    },
+    "Łódź Olechów Wschód": {
+        "radio": "R5",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Łódź Olechów Łoa": {
+        "radio": "",
+        "supervisedBy": "Łódź Olechów",
+        "manual_override": false
+    },
+    "Łódź Chojny R82": {
+        "radio": "",
+        "supervisedBy": "Łódź Chojny",
+        "manual_override": false
+    },
+    "Łódź Chojny": {
+        "radio": "R5",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Chorzew Siemkowice": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Biała Pajęczańska": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Brzeźnica nad Wartą": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Cykarzew": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Wyczerpy": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Sosnowiec Jęzor": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Kraków Przedmieście R3": {
+        "radio": "",
+        "supervisedBy": "Kraków Przedmieście",
+        "manual_override": false
+    },
+    "Kraków Olsza R2": {
+        "radio": "",
+        "supervisedBy": "Kraków Olsza",
+        "manual_override": false
+    },
+    "Kraków Olsza": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Kraków Prokocim Pra": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Krak.Prb Gt. Odjazd.": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Kraków Bieżanów PZS R39": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Podłęże R101": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Podłęże": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Kłaj": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Bochnia": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Brzesko Okocim GT": {
+        "radio": "",
+        "supervisedBy": "Brzesko Okocim",
+        "manual_override": false
+    },
+    "Brzesko Okocim": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Wola Rzędzińska": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Tarnów Wschód": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Tarnów": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Tarnów Mościce": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Bogumiłowice": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Biadoliny": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Kraków Nowa Huta NHEO": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Dąbrowa Górnicza Huta Katowice R7": {
+        "radio": "R3, R4",
+        "supervisedBy": "Dąbrowa Górnicza Huta Katowice",
+        "manual_override": true
+    },
+    "Zawiercie GT": {
+        "radio": "",
+        "supervisedBy": "Zawiercie",
+        "manual_override": false
+    },
+    "Poraj GT": {
+        "radio": "",
+        "supervisedBy": "Poraj",
+        "manual_override": false
+    },
+    "Częstochowa Tow Ctb": {
+        "radio": "",
+        "supervisedBy": "Częstochowa Towarowa",
+        "manual_override": false
+    },
+    "Kochcice": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Ciasna": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Sieraków Śląski": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Sowczyce": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Olesno Śląskie": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Stare Olesno": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Bąków": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Kluczbork": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Smardy": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Wołczyn": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Wierzbica Górna": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Domaszowice": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Gręboszów": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Namysłów": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Wilków Namysłowski": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Bierutów": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Solniki Wielkie": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Oleśnica": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Łukanów": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Borowa Oleśnicka": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Długołęka": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Wrocław Psie Pole": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Wrocław Sołtysowice": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Wrocław Nadodrze": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Piława Górna": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Ząbkowice Śląskie": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Kamieniec Ząbkowicki": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Paczków": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Otmuchów Jezioro": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Otmuchów": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Wójcice": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Goświnowice": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Nysa": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Przełęk": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Nowy Świętów": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Nowy Las": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Szybowice": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Prudnik": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Dytmarów": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Racławice Śląskie": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Głogówek": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Twardawa": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Pokrzywnica": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Kędzierzyn-Koźle Zachodnie": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Kędzierzyn-Koźle Przystanek": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Żabieniec PZS R24": {
+        "radio": "",
+        "supervisedBy": "Żabieniec",
+        "manual_override": false
+    },
+    "Taciszów": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Rzeczyce Śląskie": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Gliwice Łabędy": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Szobiszowice": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Dąbrowa Górnicza Towarowa": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Dąbrowa Górnicza Towarowa DTA": {
+        "radio": "R4",
+        "supervisedBy": "Dąbrowa Górnicza Towarowa",
+        "manual_override": true
+    },
+    "Kozioł": {
+        "radio": "R4",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Kozioł R12": {
+        "radio": "",
+        "supervisedBy": "Kozioł",
+        "manual_override": false
+    },
+    "Dąbr.Gór.Strzem. R75": {
+        "radio": "",
+        "supervisedBy": "Dąbrowa Górnicza Strzemieszyce",
+        "manual_override": false
+    },
+    "Częstochowa Mirów": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Łazy R52": {
+        "radio": "",
+        "supervisedBy": "Łazy Ła",
+        "manual_override": false
+    },
+    "Łazy Grupa Węglarkowa ŁGW": {
+        "radio": "",
+        "supervisedBy": "Łazy Ła",
+        "manual_override": false
+    },
+    "Dąbrowa Górn. Ząbkowice DZA R.4/7": {
+        "radio": "",
+        "supervisedBy": "Dąbrowa Górnicza Ząbkowice",
+        "manual_override": false
+    },
+    "Tychy Fiat": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Trzebinia": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Trzebinia TSA": {
+        "radio": "",
+        "supervisedBy": "Trzebinia",
+        "manual_override": false
+    },
+    "Balin": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Jaworzno Ciężkowice": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Pieczyska": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Sosnowiec Kazimierz PZS SKZ1": {
+        "radio": "",
+        "supervisedBy": "Sosnowiec Kazimierz",
+        "manual_override": false
+    },
+    "Dąbrowa Górnicza Towarowa DTA R5": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Przemiarki": {
+        "radio": "R2, R5",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Kraków Mydlniki": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Zabierzów": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Krzeszowice": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Rudniki koło Częstochowy": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Kłomnice": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Widzów Teklinów": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Radomsko": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Radomsko GT": {
+        "radio": "",
+        "supervisedBy": "Radomsko",
+        "manual_override": false
+    },
+    "Gomunice": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Gomunice GT": {
+        "radio": "",
+        "supervisedBy": "Gomunice",
+        "manual_override": false
+    },
+    "Gorzkowice": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Gorzkowice GT": {
+        "radio": "",
+        "supervisedBy": "Gorzkowice",
+        "manual_override": false
+    },
+    "Rozprza": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Piotrków Tryb Tow": {
+        "radio": "",
+        "supervisedBy": "Piotrków Trybunalski",
+        "manual_override": false
+    },
+    "Piotrków Trybunalski": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Baby": {
+        "radio": "R2",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Baby GT": {
+        "radio": "",
+        "supervisedBy": "Baby",
+        "manual_override": false
+    },
+    "Rokiciny": {
+        "radio": "R2",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Rokiciny GT": {
+        "radio": "",
+        "supervisedBy": "Rokiciny",
+        "manual_override": false
+    },
+    "Koluszki PZS R154": {
+        "radio": "R2, R7",
+        "supervisedBy": "Koluszki",
+        "manual_override": true
+    },
+    "Koluszki PZS R145": {
+        "radio": "R2, R7",
+        "supervisedBy": "Koluszki",
+        "manual_override": true
+    },
+    "Łódź Andrzejów": {
+        "radio": "R7",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Łódź Widzew": {
+        "radio": "R4, R5, R7",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Łódź Widzew R9": {
+        "radio": "",
+        "supervisedBy": "Łódź Widzew",
+        "manual_override": false
+    },
+    "Łódź Kaliska PZS R219-R227": {
+        "radio": "R0",
+        "supervisedBy": "Łódź Kaliska",
+        "manual_override": false
+    },
+    "Retkinia R.2": {
+        "radio": "",
+        "supervisedBy": "Retkinia",
+        "manual_override": false
+    },
+    "Retkinia": {
+        "radio": "R5",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Łódź Lublinek": {
+        "radio": "R5",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Pabianice": {
+        "radio": "R5",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Dobroń": {
+        "radio": "R5",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Łask": {
+        "radio": "R5",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Borszewice": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Gajewniki": {
+        "radio": "R5",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Zduńska Wola": {
+        "radio": "R5",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Męka": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Sieradz": {
+        "radio": "R5",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Sędzice": {
+        "radio": "R5",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Błaszki": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Radliczyce": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Opatówek": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Piwonice": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Kalisz": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Nowe Skalmierzyce": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Czekanów": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Stary Staw": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Franklinów": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Biniew": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Bronów": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Pleszew": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Kotlin": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Witaszyce": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Jarocin": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Mieszków": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Chocicza": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Sulęcinek": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Środa Wielkopolska": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Pierzchno": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Gądki": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Poznań Krzesiny": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Poznań Starołęka": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Poznań Star. pzs Psk2": {
+        "radio": "",
+        "supervisedBy": "Poznań Starołęka",
+        "manual_override": false
+    },
+    "Poznań Główny": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": false
+    },
+    "Łódź Kaliska R295": {
+        "radio": "",
+        "supervisedBy": "Łódź Kaliska",
+        "manual_override": false
+    },
+    "Łódź Dąbrowa PBS": {
+        "radio": "R5, R7",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Gniewięcin APO": {
+        "radio": "R4",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Klimontów APO": {
+        "radio": "R4",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Koluszki Bęzel.R154": {
+        "radio": "",
+        "supervisedBy": "Koluszki",
+        "manual_override": true
+    },
+    "Borowa Górka": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Mszczonów": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Marków": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Bełchów": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Skierniewice S PZS": {
+        "radio": "",
+        "supervisedBy": "Skierniewice",
+        "manual_override": true
+    },
+    "Skierniewice P PZS": {
+        "radio": "",
+        "supervisedBy": "Skierniewice",
+        "manual_override": true
+    },
+    "Płyćwia": {
+        "radio": "R2",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Płyćwia GT": {
+        "radio": "",
+        "supervisedBy": "Płyćwia",
+        "manual_override": true
+    },
+    "Rogów": {
+        "radio": "R2",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Koluszki": {
+        "radio": "R2, R7",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Łódź Widzew PZS R3": {
+        "radio": "",
+        "supervisedBy": "Łódź Widzew",
+        "manual_override": true
+    },
+    "Łódź Fabryczna": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Ostrów Wielkopolski": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Topola-Osiedle": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Odolanów": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Granowiec": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Sośnie Ostrowskie": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Twardogóra": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Grabowno Wielkie": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Dobroszyce": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Dąbrowa Oleśnicka": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Oleśnica Rataje": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Wrocław Popowice Wp3 PZS": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Wrocław Mikołajów": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Wrocław Popowice Wp2": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Warszawa Antoninów": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Lipce Reymontowskie": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Koluszki R59": {
+        "radio": "",
+        "supervisedBy": "Koluszki",
+        "manual_override": true
+    },
+    "Wołomin": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Wołomin Wschód PZS": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Tłuszcz": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Łochów": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Małkinia": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Kietlanka": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Czyżew": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Czyżew GT": {
+        "radio": "",
+        "supervisedBy": "Czyżew",
+        "manual_override": true
+    },
+    "Szepietowo": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Racibory": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Łapy": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Baciuty": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Białystok": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Puszcza Mariańska": {
+        "radio": "R2, R4",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Dąbrowice Skierniewickie": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Maków": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Krosnowa": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Przyłęk Duży": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Wągry": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Żakowice": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Łódź Niciarniana": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Koluszki R121": {
+        "radio": "",
+        "supervisedBy": "Koluszki",
+        "manual_override": true
+    },
+    "Koluszki R122": {
+        "radio": "",
+        "supervisedBy": "Koluszki",
+        "manual_override": true
+    },
+    "Żakow. Płd Zieleń R7": {
+        "radio": "",
+        "supervisedBy": "Żakowice Południowe",
+        "manual_override": true
+    },
+    "Małaszewicze Centralne": {
+        "radio": "",
+        "supervisedBy": "MAŁASZEWICZE",
+        "manual_override": true
+    },
+    "Magdalenka": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Chotyłów": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Biała Podlaska Rozrządowa": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Biała Podlaska": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Sokule": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Międzyrzec Podlaski": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Szaniawy": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Łuków": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Łuków P": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Stoczek Łukowski": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Pilawa": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Jaźwiny": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Osieck": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Kępa Gliniecka": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Góra Kalwaria": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Czachówek Wschodni": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Czachówek Zachodni": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Tarczyn": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Henryków": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Strzelin": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Boreczek": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Żórawina": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Smardzów Wrocławski": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Lamowice": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Wrocław Brochów Wbb": {
+        "radio": "",
+        "supervisedBy": "Wrocław Brochów",
+        "manual_override": true
+    },
+    "Wrocław Brochów Wbbe": {
+        "radio": "",
+        "supervisedBy": "Wrocław Brochów",
+        "manual_override": true
+    },
+    "Wrocław Brochów Wbaf": {
+        "radio": "",
+        "supervisedBy": "Wrocław Brochów",
+        "manual_override": true
+    },
+    "Wrocław Brochów Wba": {
+        "radio": "",
+        "supervisedBy": "Wrocław Brochów",
+        "manual_override": true
+    },
+    "Siechnice": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Czernica Wrocławska": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Jelcz-Laskowice": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Biskupice Oławskie": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Karłowice": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Popielów": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Dobrzeń Wielki": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Czarnowąsy PZS": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Opole Czarnowąsy": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Opole Wschodnie": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Żabieniec": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Kędzierzyn-Koźle Kkd": {
+        "radio": "",
+        "supervisedBy": "Kędzierzyn-Koźle",
+        "manual_override": true
+    },
+    "Kędzierzyn-Koźle Kkc": {
+        "radio": "",
+        "supervisedBy": "Kędzierzyn-Koźle",
+        "manual_override": true
+    },
+    "Żołnierka": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Sufczyn": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Grzebowilk": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Mińsk Mazowiecki PZS Kędzierak": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Pustelnik": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Słotwiny": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Bobrowniki": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Placencja": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Łowicz Główny": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Dobryszyce koło Radomska": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Kamieńsk": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Gorzędów": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Wilkoszewice": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Luciążanka": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Milejów": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Jarosty": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Moszczenica": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Wolbórka": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Łaznów": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Chrusty Nowe": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Błonie": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Teresin Niepokalanów": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Sochaczew": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Bednary": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Jackowice": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Żychlin": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Stara Wieś koło Kutna": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Kutno": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Kutno Wsch Tow Pprj": {
+        "radio": "",
+        "supervisedBy": "Kutno",
+        "manual_override": true
+    },
+    "Krzewie": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Kłodawa": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Zamków": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Barłogi": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Koło": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Kramsk": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Konin": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Cienin": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Słupca": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Strzałkowo": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Sokołowo Wrzesińskie": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Września": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Podstolice": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Kostrzyn Wielkopolski": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Paczkowo": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Swarzędz": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Nowa Wieś Poznańska": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Pokrzywno": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Poznań POD": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Poznań Wola": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Kiekrz": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Rokietnica": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Szamotuły": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Pęckowo": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Wronki": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Mokrz": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Miały": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Drawski Młyn": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Krzyż": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Podlesiec": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Dobiegniew": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Bierzwnik": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Słonice": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Choszczno": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Dolice": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Stargard": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Stargard Rozrz": {
+        "radio": "",
+        "supervisedBy": "Stargard",
+        "manual_override": true
+    },
+    "Reptowo": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Szczecin Dąbie Sda": {
+        "radio": "",
+        "supervisedBy": "Szczecin Dąbie",
+        "manual_override": true
+    },
+    "Szczecin Dąbie": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Szczecin Zdroje": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Regalica": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Dziewoklicz": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Szczecin Wstowo": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Szczecin Główny": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Szczecin Port Centralny": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Poznań Wschód": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Warszawa Zach. R10": {
+        "radio": "",
+        "supervisedBy": "Warszawa Zachodnia",
+        "manual_override": true
+    },
+    "Łódź Olechów PZS R16": {
+        "radio": "",
+        "supervisedBy": "Łódź Olechów Łoc",
+        "manual_override": true
+    },
+    "Łódź Olechów PZS R3": {
+        "radio": "",
+        "supervisedBy": "Łódź Olechów Łoa",
+        "manual_override": true
+    },
+    "Gajewniki Roz.3": {
+        "radio": "",
+        "supervisedBy": "Gajewniki",
+        "manual_override": true
+    },
+    "Zduńska Wola Karsznice": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Zduńska Wola Południowa": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Gajewniki Roz.7": {
+        "radio": "",
+        "supervisedBy": "Gajewniki",
+        "manual_override": true
+    },
+    "Dionizów R3": {
+        "radio": "",
+        "supervisedBy": "Dionizów",
+        "manual_override": true
+    },
+    "Dionizów R4": {
+        "radio": "",
+        "supervisedBy": "Dionizów",
+        "manual_override": true
+    },
+    "Dionizów": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Szadek": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Otok": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Poddębice": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Kłudna": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Kraski": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Dąbie nad Nerem": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Ponętów": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Borysławice": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Lipie Góry": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Babiak": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Zaryń": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Piotrków Kujawski": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Chełmce": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Karczyn": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Inowrocław Rąbinek": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Mimowola": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Jaksice": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Złotniki Kujawskie": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Nowa Wieś Wielka": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Brzoza Bydgoska": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Trzciniec": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Bydgoszcz Główna Towarowa": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Bydgoszcz Główna": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Maksymilianowo": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Kotomierz": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Pruszcz Pomorski": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Parlin": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Terespol Pomorski": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Laskowice Pomorskie": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Warlubie": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Twarda Góra": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Smętowo": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Morzeszczyn": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Pelplin": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Subkowy": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Górki": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Malinowo": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Zajączkowo Tcz. Ztb": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Zajączkowo Tcz. Ztc": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Zajączkowo Tczewskie PZS R700": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Gdańsk Święty Wojciech": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Gdańsk Olszynka R1 PZS": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Gdańsk Olszynka": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Gdańsk Port Północny R4 PZS": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Gdańsk Port Północny": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Radom Krychnowice": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Wolanów": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Przysucha": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Drzewica": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Radzice PZS R31": {
+        "radio": "",
+        "supervisedBy": "Radzice",
+        "manual_override": true
+    },
+    "Łódź Marysin": {
+        "radio": "R4",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Zgierz": {
+        "radio": "R1, R4",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Zgierz Północ": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Zgierz Kontrewers": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Chociszew": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Ozorków": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Łęczyca": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Witonia": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Łowicz Przedmieście": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Grudze": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Domaniewice": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Domaniewice Centrum": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Kamień Łowicki": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Głowno Północne": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Głowno": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Bratoszewice": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Stryków": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Swędów": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Glinnik": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Glinnik Wieś": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Smardzew": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Zgierz Rudunki": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Łódź Radogoszcz Zachód": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Łódź Żabieniec GT": {
+        "radio": "",
+        "supervisedBy": "Łódź Żabieniec",
+        "manual_override": true
+    },
+    "Łódź Żabieniec": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Łódź Kaliska": {
+        "radio": "R1, R5",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Łódź Retkinia": {
+        "radio": "R0",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Pabianice Północne": {
+        "radio": "R0",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Chechło": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Kolumna": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Izabelów": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Męcka Wola": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Sieradz Męka": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Sieradz Warta": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Skalmierz": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Kalisz Winiary": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Gawrony": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Sierpów": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Ozorków Nowe Miasto": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Grotniki": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Jedlicze koło Zgierza": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Zgierz Jaracza": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Łódź Pabianicka": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Łódź Olechów Wiadukt": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Łódź Olechów Zachód": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Łódź Olechów PZS R82": {
+        "radio": "",
+        "supervisedBy": "Łódź Olechów Łoc",
+        "manual_override": true
+    },
+    "Łódź Andrzejów Szosa": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Łódź Radogoszcz Wschód": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Łódź Arturówek": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Łódź Warszawska": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    },
+    "Łódź Stoki": {
+        "radio": "",
+        "supervisedBy": null,
+        "manual_override": true
+    }
+}
