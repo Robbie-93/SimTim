@@ -63,7 +63,7 @@ class ControlPanel(tk.Tk):
     def __init__(self, initial_host, initial_port, on_port_change, on_start, on_stop, get_status, log_path):
         super().__init__()
         self.title(f"SimTim Terminal - Control Panel (v{__version__})")
-        self.geometry("680x580")
+        self.geometry("680x720")
         self.minsize(600, 480)
         self.configure(bg=COLOR_BG)
         self._set_window_icon()
