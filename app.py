@@ -5,8 +5,6 @@ import re
 import time
 import json
 import os
-import sys
-import logging
 from datetime import datetime, timedelta
 from flask import Flask, jsonify, render_template, request
 from threading import Thread, Lock
@@ -15,19 +13,18 @@ from threading import Thread, Lock
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 app = Flask(__name__)
 
-logger = logging.getLogger(__name__)
-
 # ------------------- CONFIGURATION -------------------
-
-if getattr(sys, "frozen", False):
-    BASE_DIR = os.path.dirname(sys.executable)
-else:
-    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+# BASE_DIR = de map waarin dit script zelf staat. Alle databestanden worden
+# hiervan afgeleid, zodat de app op elke pc/gebruikersaccount werkt zonder
+# aanpassingen - nodig zodra je dit gaat verspreiden naar andere mensen.
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(BASE_DIR, "data")
 os.makedirs(DATA_DIR, exist_ok=True)
 
 HEADERS = {"User-Agent": "Mozilla/5.0 (SimTim Terminal)"}
 
+# data_cache houdt de "hot" SimRail data (trains/stations/edr) bij die op de achtergrond
+# ververst wordt, zodat een browser-poll nooit zelf een externe HTTP-call hoeft te doen.
 data_cache = {
     "trains": {"data": None, "server_id": None, "ts": 0},
     "stations": {"data": None, "server_id": None, "ts": 0},
@@ -35,14 +32,20 @@ data_cache = {
 }
 CACHE_LOCK = Lock()
 
+# Eén gedeelde requests.Session() zodat TCP/TLS-verbindingen naar de SimRail API
+# hergebruikt worden i.p.v. elke poll een nieuwe handshake te starten.
 HTTP = requests.Session()
 HTTP.headers.update(HEADERS)
 _adapter = requests.adapters.HTTPAdapter(pool_connections=20, pool_maxsize=20)
 HTTP.mount("https://", _adapter)
 HTTP.mount("http://", _adapter)
 
+# Onthoudt welke server_id op dit moment "actief" is, zodat de achtergrondloops
+# automatisch meeschakelen zodra de gebruiker van server wisselt.
 ACTIVE_SERVER_STATE = {"server_id": "en1"}
 
+# Korte TTL-cache voor treintimetables: een dienstregeling verandert niet elke 2 seconden,
+# dus we hoeven 'm niet elke poll opnieuw op te halen voor hetzelfde treinnummer.
 TIMETABLE_TTL_CACHE = {}
 TIMETABLE_TTL_SECONDS = 60
 
@@ -66,6 +69,8 @@ def get_radio_db():
     if _radio_db_cache is not None:
         return _radio_db_cache
 
+    # Zorg dat je het juiste pad gebruikt (waar je json staat)
+    # Gebruik een absoluut pad voor de zekerheid
     json_path = os.path.join(DATA_DIR, "simrail_radio.json")
     if os.path.exists(json_path):
         with open(json_path, 'r', encoding='utf-8') as f:
@@ -94,6 +99,7 @@ TIMETABLE_CACHE = {}
 
 def get_train_length_from_api(server_id, train_id):
     """Haalt de exacte lengte op uit de SimRail Timetable API met caching"""
+    # Als we het al eens gevraagd hebben, geef het direct terug
     if train_id in TIMETABLE_CACHE:
         return TIMETABLE_CACHE[train_id]
         
@@ -109,7 +115,7 @@ def get_train_length_from_api(server_id, train_id):
             TIMETABLE_CACHE[train_id] = length # Opslaan in het geheugen
             return length
     except Exception as e:
-        logger.error(f"Failed to fetch timetable for train {train_id}: {e}")
+        print(f"Fout bij ophalen timetable voor {train_id}: {e}")
         
     return 200 # Fallback als de API offline is of herhaaldelijk faalt
 
@@ -125,7 +131,7 @@ def load_train_data():
     raw_list = None
 
     try:
-        logger.info("[TRAIN_DB] Downloading latest train database...")
+        print("[TRAIN_DB] Downloading latest train database...")
         response = HTTP.get(TRAIN_DB_URL, timeout=10)
         if response.status_code == 200:
             raw_list = response.json()
@@ -134,25 +140,25 @@ def load_train_data():
             with open(CACHE_FILE, "w", encoding="utf-8") as f:
                 json.dump(raw_list, f, ensure_ascii=False, indent=2)
 
-            logger.info(f"[TRAIN_DB] Cache updated: {CACHE_FILE}")
+            print(f"[TRAIN_DB] Cache updated: {CACHE_FILE}")
 
     except Exception as e:
-        logger.warning(f"[TRAIN_DB] Online download failed: {e}")
+        print(f"[TRAIN_DB] Online download failed: {e}")
 
     # ==========================================================
     # 2. FALLBACK NAAR LOKALE CACHE
     # ==========================================================
     if raw_list is None:
         try:
-            logger.info("[TRAIN_DB] Loading local cache...")
+            print("[TRAIN_DB] Loading local cache...")
 
             with open(CACHE_FILE, "r", encoding="utf-8") as f:
                 raw_list = json.load(f)
 
-            logger.info(f"[TRAIN_DB] Local cache loaded: {CACHE_FILE}")
+            print(f"[TRAIN_DB] Local cache loaded: {CACHE_FILE}")
 
         except Exception as e:
-            logger.error(f"[TRAIN_DB] Failed to load local cache: {e}")
+            print(f"[TRAIN_DB] Failed to load local cache: {e}")
             raw_list = []
 
     # ==========================================================
@@ -166,7 +172,7 @@ def load_train_data():
 
     train_db = temp_db
 
-    logger.info(f"[TRAIN_DB] Loaded {len(train_db)} train entries.")
+    print(f"[TRAIN_DB] Loaded {len(train_db)} train entries.")
 
 def load_vehicles_db():
     global vehicles_db
@@ -174,9 +180,9 @@ def load_vehicles_db():
         try:
             with open(VEHICLES_FILE, 'r', encoding='utf-8') as f:
                 vehicles_db = json.load(f)
-            logger.info("[VEHICLES_DB] Enriched vehicle database loaded successfully.")
+            print(f"[VEHICLES_DB] Enriched vehicle database loaded successfully.")
         except Exception as e:
-            logger.error(f"[VEHICLES_DB] Error loading enriched vehicle database: {e}")
+            print(f"[VEHICLES_DB] Error loading enriched vehicle database: {e}")
 
 # ==========================================================================
 # ACHTERGROND-CACHE SYSTEEM (netwerk-optimalisatie)
@@ -187,7 +193,18 @@ def _cache_refresh_loop(cache_key, url_builder, interval, verify_ssl=True):
         server_id = ACTIVE_SERVER_STATE["server_id"]
         try:
             url = url_builder(server_id)
+            fetch_started = time.time()
             response = HTTP.get(url, timeout=5, verify=verify_ssl)
+            fetch_duration = time.time() - fetch_started
+            size_kb = len(response.content) / 1024
+
+            # TIJDELIJKE DIAGNOSTIEK: laat zien hoe groot elke achtergrond-fetch is en
+            # hoe lang die duurde, zodat we grote/langzame pulls kunnen koppelen aan
+            # ping-spikes. Kan later weer weg als de oorzaak gevonden is.
+            print(f"[CACHE:{cache_key}] {size_kb:.1f} KB in {fetch_duration:.2f}s "
+                  f"(status {response.status_code}, encoding={response.headers.get('Content-Encoding', 'none')}) "
+                  f"@ {time.strftime('%H:%M:%S')}")
+
             if response.status_code == 200:
                 with CACHE_LOCK:
                     data_cache[cache_key] = {
@@ -196,7 +213,7 @@ def _cache_refresh_loop(cache_key, url_builder, interval, verify_ssl=True):
                         "ts": time.time()
                     }
         except Exception as e:
-            logger.warning(f"[CACHE:{cache_key}] Background refresh failed: {e}")
+            print(f"[CACHE:{cache_key}] Achtergrond-refresh mislukt: {e}")
         time.sleep(interval)
 
 def start_background_loops():
@@ -219,7 +236,7 @@ def start_background_loops():
         60, True
     ), daemon=True).start()
 
-    logger.info("[CACHE] Background loops started for trains/stations/edr.")
+    print("[CACHE] Achtergrondloops gestart voor trains/stations/edr.")
 
 def get_cached_or_fetch(cache_key, url, server_id, verify_ssl=True, max_age=None):
 
@@ -242,7 +259,7 @@ def get_cached_or_fetch(cache_key, url, server_id, verify_ssl=True, max_age=None
             data_cache[cache_key] = {"data": data, "server_id": server_id, "ts": time.time()}
         return data
     except Exception as e:
-        logger.warning(f"[CACHE:{cache_key}] Fallback fetch failed: {e}")
+        print(f"[CACHE:{cache_key}] Fallback-fetch mislukt: {e}")
         return entry.get("data")
 
 _RADAR_DB_CONN = None
@@ -268,12 +285,13 @@ def build_radar_path(start_signal_name, dist_to_start_signal, live_signal_speed,
             conn.row_factory = sqlite3.Row
             cursor = conn.cursor()
 
-            # 1. GEPASSEERD SEIN (is_abs toegevoegd aan SELECT)
+            # 1. GEPASSEERD SEIN (is_abs en empl_abbr toegevoegd aan SELECT)
             cursor.execute("""
                 SELECT c.from_signal, 
                        COALESCE(c.max_distance, 0) as max_distance, 
                        s.emplacement_group,
-                       s.is_abs
+                       s.is_abs,
+                       s.empl_abbr
                 FROM signal_connections c
                 LEFT JOIN signals s ON c.from_signal = s.signal_name
                 WHERE c.to_signal = ?
@@ -289,7 +307,7 @@ def build_radar_path(start_signal_name, dist_to_start_signal, live_signal_speed,
                 passed_dist = dist_to_start_signal - dist_between_signals
             
                 is_prev_empl = bool(prev_group and not str(prev_group).startswith('ABS_'))
-                prev_empl_code = prev_signal[:2] if is_prev_empl else None
+                prev_empl_code = prev_row['empl_abbr'] if is_prev_empl else None
             
                 map_elements.append({
                     "type": "signal",
@@ -301,15 +319,15 @@ def build_radar_path(start_signal_name, dist_to_start_signal, live_signal_speed,
                     "is_abs": prev_row['is_abs'] if prev_row['is_abs'] is not None else 0
                 })
 
-            # 2. EERSTVOLGENDE STARTSEIN (is_abs toegevoegd aan SELECT)
-            cursor.execute("SELECT emplacement_group, is_abs FROM signals WHERE signal_name = ?", (start_signal_name,))
+            # 2. EERSTVOLGENDE STARTSEIN (is_abs en empl_abbr toegevoegd aan SELECT)
+            cursor.execute("SELECT emplacement_group, is_abs, empl_abbr FROM signals WHERE signal_name = ?", (start_signal_name,))
             start_row = cursor.fetchone()
         
             start_group = start_row['emplacement_group'] if start_row else 'ABS_'
             start_abs = start_row['is_abs'] if start_row and start_row['is_abs'] is not None else 0
         
             is_start_empl = bool(start_group and not str(start_group).startswith('ABS_'))
-            start_empl_code = start_signal_name[:2] if is_start_empl else None
+            start_empl_code = start_row['empl_abbr'] if start_row and is_start_empl else None
         
             map_elements.append({
                 "type": "signal",
@@ -321,7 +339,9 @@ def build_radar_path(start_signal_name, dist_to_start_signal, live_signal_speed,
                 "is_abs": start_abs
             })
 
-            # 3. DE REST VAN DE SLIERT (s.is_abs toegevoegd aan SELECT)
+            # 3. DE REST VAN DE SLIERT (s.is_abs en s.empl_abbr toegevoegd aan SELECT)
+            # LET OP: c.line_number is verwijderd uit de SELECT, deze kolom bestaat
+            # niet meer in signal_connections na de opschoning van signals.db.
             accumulated_distance = dist_to_start_signal
             current_signal = start_signal_name
 
@@ -329,10 +349,10 @@ def build_radar_path(start_signal_name, dist_to_start_signal, live_signal_speed,
                 cursor.execute("""
                     SELECT c.to_signal, 
                            COALESCE(c.max_distance, 0) as max_distance, 
-                           c.line_number, 
                            COALESCE(c.measurements, 0) as measurements, 
                            s.emplacement_group,
-                           s.is_abs
+                           s.is_abs,
+                           s.empl_abbr
                     FROM signal_connections c
                     LEFT JOIN signals s ON c.to_signal = s.signal_name
                     WHERE c.from_signal = ?
@@ -371,7 +391,7 @@ def build_radar_path(start_signal_name, dist_to_start_signal, live_signal_speed,
                 
                     next_group = next_conn['emplacement_group']
                     is_next_empl = bool(next_group and not str(next_group).startswith('ABS_'))
-                    next_empl_code = next_signal[:2] if is_next_empl else None
+                    next_empl_code = next_conn['empl_abbr'] if is_next_empl else None
 
                     map_elements.append({
                         "type": "signal",
@@ -386,7 +406,7 @@ def build_radar_path(start_signal_name, dist_to_start_signal, live_signal_speed,
                     current_signal = next_signal
 
         except Exception as e:
-            logger.error(f"[RADAR] Radar path error: {e}")
+            print(f"[ERROR] Radar path error: {e}")
 
     return map_elements
 # -------------------- ROUTES --------------------
@@ -858,6 +878,7 @@ def get_train_data():
 
         berekende_seinen = []
         if live_signal_name:
+            print(f"[RADAR] Live sein: {live_signal_name} op {live_signal_dist}m. Sliert berekenen...")
             berekende_seinen = build_radar_path(
                 start_signal_name=live_signal_name, 
                 dist_to_start_signal=live_signal_dist,
@@ -939,7 +960,7 @@ def get_train_data():
         })
 
     except Exception as e:
-        logger.error(f"Error in get_train_data: {e}")
+        print(f"Fout in get_train_data: {e}")
         return jsonify({"error": str(e)}), 500
 
 # -------------------- RUN --------------------
@@ -955,15 +976,6 @@ def add_header(response):
 if __name__ == '__main__':
     DEBUG_MODE = True 
     IS_REAL_SERVER_PROCESS = not DEBUG_MODE or os.environ.get('WERKZEUG_RUN_MAIN') == 'true'
-
-    # Alleen relevant voor lokale dev-runs (python app.py): stuurt logger-output
-    # naar de console, want dat gebeurt anders alleen als launcher.py eerst
-    # setup_logging() heeft aangeroepen (zie log_setup.py).
-    if IS_REAL_SERVER_PROCESS:
-        logging.basicConfig(
-            level=logging.INFO,
-            format="%(asctime)s [%(levelname)s] %(name)s: %(message)s"
-        )
 
     if IS_REAL_SERVER_PROCESS:
         load_train_data()
