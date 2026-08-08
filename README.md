@@ -33,7 +33,7 @@ SimTim is packaged as a standalone executable (`.exe`), meaning you do not need 
 
 1. Go to the **Releases** tab on the right side of this GitHub repository.
 2. Download the latest `SimTim.zip` file.
-3. Extract the `Dist` folder in a folder of your choice. That folder will now contain `SimTim.exe` and a `data` folder.
+3. Extract the `SimTim` folder in a folder of your choice. That folder will now contain `SimTim.exe` and a `data` folder.
 4. Create a shortcut or run `SimTim.exe` from that location. 
 
 > ### ⚠️ Windows SmartScreen Notice
@@ -122,5 +122,32 @@ During my periods at home, I will actively dedicate time to maintenance, feature
 * **Issues:** Open a ticket via the [GitHub Issues](https://github.com/Robbie-93/SimTim/issues) tab.
 * **Discussions:** Feel free to share ideas or feedback in the community tab or in the post on the SimRail Forum.
 
+## Credits
+
+Signal data was initially based on data from **TrueVirus' [SRTO project](https://thetruevirus.github.io/simrail-tools-html/)**, and has since been expanded with additional data for use in SimTim.
+
+Many thanks to TrueVirus for allowing me to use his data as a basis for this project.
+
 ## License
-Distributed under the MIT License. See `LICENSE` for more information.
+
+SimTim is licensed under the **GNU General Public License v3.0 (GPLv3)**.
+
+The SimTim source code may be used, studied, modified, and redistributed under the terms of the GPLv3.
+
+### Third-party data and content
+
+SimTim uses data obtained from publicly accessible SimRail APIs and other third-party sources. This data may include information such as timetables, trains, vehicles, signals, radio information, and other SimRail-related information.
+
+The data included with SimTim has been collected, processed, structured, and compiled by the SimTim project for use by the application.
+
+SimTim does **not** claim ownership of the underlying third-party data, nor does the GPLv3 license grant ownership of or additional rights to data, trademarks, logos, artwork, or other content belonging to SimRail or other third parties.
+
+Any rights, licenses, terms of use, or restrictions applicable to third-party data remain applicable to that data. Users and distributors of SimTim are responsible for complying with the applicable terms of the original data sources and APIs.
+
+The GPLv3 license applies to the SimTim source code and to original work created by the SimTim project to the extent that such work is copyrightable. It does not override or replace the rights of third parties in their own content or data.
+
+### SimTim branding
+
+The name **SimTim**, the SimTim logo, application icon, and other branding identifying the original SimTim project are not intended to be licensed as third-party content under the GPLv3.
+
+Forks and modified versions of SimTim are permitted under the GPLv3, but should not be presented as the official SimTim project or imply that they are developed, maintained, or endorsed by the original SimTim project or its author.
