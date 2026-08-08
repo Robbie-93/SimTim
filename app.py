@@ -5,6 +5,7 @@ import re
 import time
 import json
 import os
+import sys
 from datetime import datetime, timedelta
 from flask import Flask, jsonify, render_template, request
 from threading import Thread, Lock
@@ -14,17 +15,15 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 app = Flask(__name__)
 
 # ------------------- CONFIGURATION -------------------
-# BASE_DIR = de map waarin dit script zelf staat. Alle databestanden worden
-# hiervan afgeleid, zodat de app op elke pc/gebruikersaccount werkt zonder
-# aanpassingen - nodig zodra je dit gaat verspreiden naar andere mensen.
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+if getattr(sys, "frozen", False):
+    BASE_DIR = os.path.dirname(sys.executable)
+else:
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(BASE_DIR, "data")
 os.makedirs(DATA_DIR, exist_ok=True)
 
 HEADERS = {"User-Agent": "Mozilla/5.0 (SimTim Terminal)"}
 
-# data_cache houdt de "hot" SimRail data (trains/stations/edr) bij die op de achtergrond
-# ververst wordt, zodat een browser-poll nooit zelf een externe HTTP-call hoeft te doen.
 data_cache = {
     "trains": {"data": None, "server_id": None, "ts": 0},
     "stations": {"data": None, "server_id": None, "ts": 0},
@@ -32,20 +31,14 @@ data_cache = {
 }
 CACHE_LOCK = Lock()
 
-# Eén gedeelde requests.Session() zodat TCP/TLS-verbindingen naar de SimRail API
-# hergebruikt worden i.p.v. elke poll een nieuwe handshake te starten.
 HTTP = requests.Session()
 HTTP.headers.update(HEADERS)
 _adapter = requests.adapters.HTTPAdapter(pool_connections=20, pool_maxsize=20)
 HTTP.mount("https://", _adapter)
 HTTP.mount("http://", _adapter)
 
-# Onthoudt welke server_id op dit moment "actief" is, zodat de achtergrondloops
-# automatisch meeschakelen zodra de gebruiker van server wisselt.
 ACTIVE_SERVER_STATE = {"server_id": "en1"}
 
-# Korte TTL-cache voor treintimetables: een dienstregeling verandert niet elke 2 seconden,
-# dus we hoeven 'm niet elke poll opnieuw op te halen voor hetzelfde treinnummer.
 TIMETABLE_TTL_CACHE = {}
 TIMETABLE_TTL_SECONDS = 60
 
@@ -69,8 +62,6 @@ def get_radio_db():
     if _radio_db_cache is not None:
         return _radio_db_cache
 
-    # Zorg dat je het juiste pad gebruikt (waar je json staat)
-    # Gebruik een absoluut pad voor de zekerheid
     json_path = os.path.join(DATA_DIR, "simrail_radio.json")
     if os.path.exists(json_path):
         with open(json_path, 'r', encoding='utf-8') as f:
@@ -108,7 +99,6 @@ def get_train_length_from_api(server_id, train_id):
         response = HTTP.get(url, timeout=2) # Korte timeout om hangen te voorkomen
         if response.status_code == 200:
             data = response.json()
-            # De API geeft een lijst of direct een object, even checken:
             timetable_obj = data[0] if isinstance(data, list) else data
             
             length = timetable_obj.get('trainLength', 200) # 200 als fallback
@@ -198,9 +188,6 @@ def _cache_refresh_loop(cache_key, url_builder, interval, verify_ssl=True):
             fetch_duration = time.time() - fetch_started
             size_kb = len(response.content) / 1024
 
-            # TIJDELIJKE DIAGNOSTIEK: laat zien hoe groot elke achtergrond-fetch is en
-            # hoe lang die duurde, zodat we grote/langzame pulls kunnen koppelen aan
-            # ping-spikes. Kan later weer weg als de oorzaak gevonden is.
             print(f"[CACHE:{cache_key}] {size_kb:.1f} KB in {fetch_duration:.2f}s "
                   f"(status {response.status_code}, encoding={response.headers.get('Content-Encoding', 'none')}) "
                   f"@ {time.strftime('%H:%M:%S')}")
@@ -340,8 +327,6 @@ def build_radar_path(start_signal_name, dist_to_start_signal, live_signal_speed,
             })
 
             # 3. DE REST VAN DE SLIERT (s.is_abs en s.empl_abbr toegevoegd aan SELECT)
-            # LET OP: c.line_number is verwijderd uit de SELECT, deze kolom bestaat
-            # niet meer in signal_connections na de opschoning van signals.db.
             accumulated_distance = dist_to_start_signal
             current_signal = start_signal_name
 
@@ -909,7 +894,7 @@ def get_train_data():
                 
                 if matching_sig:
                     # ==================================================================
-                    # HIER GEBEURT HET: Kleur het sein in met de voorwaarde van de voorligger
+                    # Kleur het sein in met de voorwaarde van de voorligger
                     # ==================================================================
                     raw_other_speed = other_td.get('SignalInFrontSpeed', 0)
                     matching_sig['speed'] = "Vmax" if raw_other_speed == 32767 else raw_other_speed

@@ -4,27 +4,26 @@ import threading
 import os
 import shutil
 import socket
+import sys
 import webbrowser
 
 from update_checker import check_for_update
 from version import __version__
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-LOGO_PATH = os.path.join(BASE_DIR, "assets", "logo.png")
 
-ICON_PATH = os.path.join(BASE_DIR, "icon.ico")
+if getattr(sys, "frozen", False):
+    BASE_DIR = os.path.dirname(sys.executable)
+    RESOURCE_DIR = getattr(sys, "_MEIPASS", BASE_DIR)
+else:
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+    RESOURCE_DIR = BASE_DIR
+LOGO_PATH = os.path.join(RESOURCE_DIR, "assets", "logo.png")
+
+ICON_PATH = os.path.join(RESOURCE_DIR, "icon.ico")
 
 
 def _detect_lan_ip():
-    """
-    Bepaalt het LAN IP-adres van deze pc (bv. 192.168.1.23). Nodig omdat de
-    server bindt op 0.0.0.0 (alle interfaces), maar dat adres zelf is niet
-    bruikbaar om vanaf een ander apparaat naartoe te browsen.
 
-    Trucje: een UDP-socket "verbinden" naar een extern adres verstuurt geen
-    daadwerkelijke data, maar dwingt het OS wel om de uitgaande interface (en
-    dus het LAN IP) te kiezen - precies wat we nodig hebben.
-    """
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     try:
         s.connect(("8.8.8.8", 80))
@@ -130,16 +129,7 @@ class ControlPanel(tk.Tk):
         )
 
     def _set_window_icon(self):
-        """
-        Zet het venster-/taskbar-icoon op Windows. iconbitmap(default=...)
-        past dit ook toe op alle Toplevel-vensters die vanuit dit venster
-        worden geopend (bv. de messagebox-dialogen), niet alleen het
-        hoofdvenster zelf.
-
-        Faalt stil als icon.ico ontbreekt of niet geladen kan worden (bv. op
-        een niet-Windows platform) - dan blijft gewoon het standaard
-        Tk-icoon staan.
-        """
+        
         if os.path.exists(ICON_PATH):
             try:
                 self.iconbitmap(default=ICON_PATH)
@@ -220,7 +210,7 @@ class ControlPanel(tk.Tk):
     def _handle_stop(self):
         ok, error = self.on_stop()
         if not ok:
-            messagebox.showerror("Failed to stop", error or "Unknown error")
+            messagebox.showerror("Failed to stop, use close window to stop the hosting", error or "Unknown error, use close window to stop the hosting")
 
     def _poll_status(self):
         try:
