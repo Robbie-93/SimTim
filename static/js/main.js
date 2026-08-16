@@ -17,7 +17,12 @@ function el(id) {
 const state = {
     server: null,
     train: "",
-    trainType: "-"
+    trainType: "-",
+    // Wordt false zolang het numpad open staat en de gebruiker nog aan het
+    // typen is, en pas true na confirmNum(). Voorkomt dat de periodieke
+    // syncActiveData-interval (elke 2s) al data ophaalt op basis van een
+    // nog niet-bevestigd, gedeeltelijk ingetypt treinnummer.
+    confirmed: true
 };
 
 let themes = ['night', 'dusk', 'day'];
@@ -178,6 +183,7 @@ function handleTrainClick() {
     }
 
     state.train = ""; 
+    state.confirmed = false;
     document.getElementById('train-label').innerText = "_";
     document.getElementById('numpad').style.display = 'block';
 }
@@ -196,6 +202,8 @@ function clearNum() {
 async function confirmNum() {
     document.getElementById('numpad').style.display = 'none';
     if (!state.train) return;
+
+    state.confirmed = true;
 
     const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -313,7 +321,7 @@ window.closeCMD = function() {
 
 /* ================== CORE DATA INTERVAL SYNC ================== */
 async function syncActiveData() {
-    if (!state.train || !state.server) return null;
+    if (!state.train || !state.server || !state.confirmed) return null;
 
     try {
         console.log(`[Sync] Fetching data for: ${state.server} / ${state.train}`);

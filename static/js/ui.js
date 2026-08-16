@@ -3,6 +3,16 @@
    ========================================================================== */
 let lastLoadedTrainNumber = null;
 
+const EMPLACEMENT_EXIT_BUFFER_M = 500;
+
+const FLASH_ON_MS = 1000;
+const FLASH_OFF_MS = 500;
+
+function isFlashOn() {
+    const cycle = FLASH_ON_MS + FLASH_OFF_MS;
+    return (Date.now() % cycle) < FLASH_ON_MS;
+}
+
 const SimRailUI = {
     _autoScrollLocked: true,
     _mapViewRange: 5000, 
@@ -210,41 +220,104 @@ renderMap(data) {
         // LAAG 1: LAAG MET EMPLACEMENT-BLOKKEN OVER DE HELE BREEDTE (PRE-PASS)
         // ==================================================================
         if (data.map_elements) {
+            const findAdjacentSignal = (idx, direction) => {
+                const step = direction === 'next' ? 1 : -1;
+                for (let j = idx + step; j >= 0 && j < data.map_elements.length; j += step) {
+                    if (data.map_elements[j].type === 'signal') return j;
+                }
+                return -1;
+            };
+
+            const computeSegmentBounds = (idx) => {
+                const el = data.map_elements[idx];
+                const nextIdx = findAdjacentSignal(idx, 'next');
+                const prevIdx = findAdjacentSignal(idx, 'prev');
+                const nextSignal = nextIdx !== -1 ? data.map_elements[nextIdx] : null;
+                const prevSignal = prevIdx !== -1 ? data.map_elements[prevIdx] : null;
+
+                const sameEmplacementForward = nextSignal
+                    && nextSignal.is_emplacement
+                    && nextSignal.emplacement_code === el.emplacement_code;
+
+                const isEntrySignal = !prevSignal
+                    || !prevSignal.is_emplacement
+                    || prevSignal.emplacement_code !== el.emplacement_code;
+
+                let startDist = el.dist;
+                if (isEntrySignal) {
+                    const bufferStart = el.dist - EMPLACEMENT_EXIT_BUFFER_M;
+                    startDist = prevSignal ? Math.max(bufferStart, prevSignal.dist) : bufferStart;
+                }
+
+                let endDist;
+                if (sameEmplacementForward) {
+                    endDist = nextSignal.dist;
+                } else if (nextSignal) {
+                    endDist = Math.min(el.dist + EMPLACEMENT_EXIT_BUFFER_M, nextSignal.dist);
+                } else {
+                    endDist = el.dist + EMPLACEMENT_EXIT_BUFFER_M;
+                }
+
+                const startY = trainY - (startDist * pixelsPerMeter);
+                let endY = trainY - (endDist * pixelsPerMeter);
+                if (endY < 0) endY = 0;
+
+                return { startDist, endDist, startY, endY, isEntrySignal, nextIdx };
+            };
+
             for (let i = 0; i < data.map_elements.length; i++) {
                 const el = data.map_elements[i];
-                
-                // Als dit het begin is van een emplacement, kleur de hele breedte tot het volgende sein
-                if (el.type === 'signal' && el.is_emplacement) {
-                    const startY = trainY - (el.dist * pixelsPerMeter);
-                    if (startY < 0) continue;
+                if (el.type !== 'signal' || !el.is_emplacement) continue;
 
-                    let endY = 0;
-                    for (let j = i + 1; j < data.map_elements.length; j++) {
-                        if (data.map_elements[j].type === 'signal') {
-                            endY = trainY - (data.map_elements[j].dist * pixelsPerMeter);
-                            break;
-                        }
-                    }
-                    if (endY < 0) endY = 0;
+                const bounds = computeSegmentBounds(i);
+                if (bounds.startY < 0) continue;
 
-                    const blockHeight = startY - endY; 
+                const blockHeight = bounds.startY - bounds.endY;
+                ctx.fillStyle = document.body.getAttribute('data-theme') === 'day' 
+                    ? 'rgba(0, 100, 255, 0.05)'  // Heel lichtblauw overdag
+                    : 'rgba(255, 255, 255, 0.07)';    // Strak CMD Slate-Blue 's nachts
+                ctx.fillRect(0, bounds.endY, cssWidth, blockHeight);
+            }
 
-                    if (el.emplacement_code) {
-                        ctx.save();
-                        ctx.fillStyle = 'var(--text-muted)';
-                        ctx.font = '1.2Em "Courier New", Courier, monospace';
-                        ctx.textAlign = 'center';
-                        ctx.textBaseline = 'middle';
-                        // Geplaatst aan de linkerkant van het spoor (kwart van de canvasbreedte)
-                        ctx.fillText(el.emplacement_code, centerX / 2, endY + (blockHeight / 2));
-                        ctx.restore();
-                    }
-                    // WIJZIGING: Teken over de VOLLEDIGE breedte (van X=0 tot X=cssWidth)
-                    ctx.fillStyle = document.body.getAttribute('data-theme') === 'day' 
-                        ? 'rgba(0, 100, 255, 0.05)'  // Heel lichtblauw overdag
-                        : 'rgba(255, 255, 255, 0.07)';    // Strak CMD Slate-Blue 's nachts
-                    ctx.fillRect(0, endY, cssWidth, blockHeight);
+            const labeledEmplacementCodes = new Set();
+
+            const emplacementLabelColor = getComputedStyle(document.body)
+                .getPropertyValue('--text-muted').trim() || '#e2e8f0';
+
+            for (let i = 0; i < data.map_elements.length; i++) {
+                const el = data.map_elements[i];
+                if (el.type !== 'signal' || !el.is_emplacement) continue;
+                if (!el.emplacement_code || labeledEmplacementCodes.has(el.emplacement_code)) continue;
+
+                const bounds = computeSegmentBounds(i);
+                if (bounds.startY < 0) continue;
+                labeledEmplacementCodes.add(el.emplacement_code);
+
+                let chainEndDist = bounds.endDist;
+                let scanIdx = i;
+                while (true) {
+                    const nextIdx = findAdjacentSignal(scanIdx, 'next');
+                    if (nextIdx === -1) break;
+                    const candidate = data.map_elements[nextIdx];
+                    if (!candidate.is_emplacement || candidate.emplacement_code !== el.emplacement_code) break;
+                    scanIdx = nextIdx;
+                    chainEndDist = computeSegmentBounds(scanIdx).endDist;
                 }
+
+                const chainEndY = trainY - (chainEndDist * pixelsPerMeter);
+
+                const visibleTop = Math.max(Math.min(bounds.startY, chainEndY), 0);
+                const visibleBottom = Math.min(Math.max(bounds.startY, chainEndY), cssHeight);
+                const labelY = (visibleTop + visibleBottom) / 2;
+
+                ctx.save();
+                ctx.fillStyle = emplacementLabelColor;
+                ctx.font = '1.2Em "Courier New", Courier, monospace';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                // Geplaatst aan de linkerkant van het spoor (kwart van de canvasbreedte)
+                ctx.fillText(el.emplacement_code, centerX / 2, labelY);
+                ctx.restore();
             }
         }
 
@@ -281,15 +354,8 @@ renderMap(data) {
                     let drawLine = false;      
                     let lineColor = '';        
 
-                    // Een sein dat we al gepasseerd zijn (dist < 0) beschermt nu het
-                    // blok waar wijzelf in staan - dat moet dus altijd rood tonen,
-                    // ongeacht wat de API/cascade eerder liet zien, totdat het sein
-                    // buiten beeld scrollt. Dit heeft dus voorrang op alles hieronder.
                     const isPassedSignal = el.dist < 0;
 
-                    // ABS-blokcascade heeft voorrang: als dit ABS-sein op basis van
-                    // afgeleide blokbezetting rood/geel/knipperend-groen/groen moet
-                    // zijn, gebruiken we dat i.p.v. de (nog onbekende) el.speed.
                     const absOverride = absOverrides.get(el);
 
                     if (isPassedSignal) {
@@ -300,24 +366,28 @@ renderMap(data) {
                         } else if (absOverride.mode === 'yellow') {
                             dotColor = '#facc15';
                         } else if (absOverride.mode === 'flash-green') {
-                            dotColor = (Math.floor(Date.now() / 500) % 2 === 0) ? '#008000' : '#2a2a2a';
+                            dotColor = isFlashOn() ? '#008000' : '#2a2a2a';
                         } else if (absOverride.mode === 'green') {
                             dotColor = '#008000';
                         }
                     } else if (el.speed === 'Vmax') {
                         dotColor = '#008000';
                     } else if (el.speed === 130) {
-                        dotColor = (Math.floor(Date.now() / 500) % 2 === 0) ? '#008000' : '#2a2a2a';  
+                        dotColor = isFlashOn() ? '#008000' : '#2a2a2a';  
                     } else if (el.speed === 100) {
                         dotColor = '#facc15';  
                         drawLine = true;
-                        lineColor = '#008000'; 
+                        lineColor = '#008000';
+                    } else if (el.speed === 80) {
+                        dotColor = '#facc15';  
+                        drawLine = true;
+                        lineColor = '#facc15'; 
                     } else if (el.speed === 60) {
                         dotColor = '#facc15';  
                         drawLine = true;
                         lineColor = '#facc15';
                     } else if (el.speed === 50) {
-                        dotColor = (Math.floor(Date.now() / 500) % 2 === 0) ? '#facc15' : '#2a2a2a';   
+                        dotColor = isFlashOn() ? '#facc15' : '#2a2a2a';   
                     } else if (el.speed === 40) {
                         dotColor = '#facc15';  
                     } else if (el.speed === 0) {
@@ -481,9 +551,7 @@ renderMap(data) {
                 return;
             }
 
-            // Laatste ABS-sein vóór een emplacement: flashing groen, want het
-            // dispatcher-sein erna valt buiten deze cascade en kan alsnog
-            // afwijken - dat zien we pas zodra het ons eigen eerstvolgende sein is.
+            // Laatste ABS-sein vóór een emplacement: flashing groen
             const nextIsEmplacementEntry = signals[i + 1] && signals[i + 1].is_emplacement;
             if (nextIsEmplacementEntry) {
                 overrides.set(sig, { mode: 'flash-green' });
@@ -518,7 +586,7 @@ renderMap(data) {
             if (this._hasFlashingSignal(this._lastMapData)) {
                 this.renderMap(this._lastMapData);
             }
-        }, 125); // ruim onder de kortste flash-periode (250ms) voor een vloeiende toggle
+        }, 125);
     },
 
     /**
@@ -599,7 +667,7 @@ renderMap(data) {
 
             let dispatcherHTML = null;
 
-            if (stop.supervisedBy && stop.supervisedBy.trim().length > 0) {
+            if (stop.dispatcher === 'user' || stop.dispatcher === 'laptop') {
                 const dispIcon = stop.dispatcher === 'user' ? 'user-round-check' : 'laptop';
                 const dispColor = stop.dispatcher === 'user' ? '#008000' : '#ffaa00';
                 const label = stop.dispatcher === 'user' ? 'PLAYER' : 'BOT';
@@ -636,10 +704,9 @@ renderMap(data) {
             // 1. Radio logica: check of er na trimmen echte tekst overblijft
             const finalRadio = (stop.radio && stop.radio.trim() !== "") ? stop.radio.trim(): null;
             
-            // 2. Dispatcher logica:
             let dispatcherHTML = null;
 
-            if (stop.supervisedBy && stop.supervisedBy.trim().length > 0) {
+            if (stop.dispatcher === 'user' || stop.dispatcher === 'laptop') {
                 const dispIcon = stop.dispatcher === 'user' ? 'user-round-check' : 'laptop';
                 const dispColor = stop.dispatcher === 'user' ? '#008000' : '#ffaa00';
                 const label = stop.dispatcher === 'user' ? 'PLAYER' : 'BOT';

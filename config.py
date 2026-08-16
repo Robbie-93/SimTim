@@ -10,7 +10,8 @@ CONFIG_PATH = os.path.join(BASE_DIR, "config.json")
 
 DEFAULT_CONFIG = {
     "host": "0.0.0.0",
-    "port": 5000
+    "port": 5000,
+    "threaded": True
 }
 
 

@@ -6,13 +6,26 @@ import time
 import json
 import os
 import sys
-from datetime import datetime, timedelta
+import logging
+import traceback
+from datetime import datetime, timedelta, timezone
 from flask import Flask, jsonify, render_template, request
 from threading import Thread, Lock
+from werkzeug.exceptions import HTTPException
+from log_setup import set_log_context
 
 # ------------------ SETTING ---------------------------
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 app = Flask(__name__)
+
+# ------------------- LOGGING --------------------------
+logger = logging.getLogger("app")
+cache_logger = logging.getLogger("app.cache")
+radar_logger = logging.getLogger("app.radar")
+traindb_logger = logging.getLogger("app.traindb")
+vehicles_logger = logging.getLogger("app.vehicles")
+request_logger = logging.getLogger("app.request")
+health_logger = logging.getLogger("app.health")
 
 # ------------------- CONFIGURATION -------------------
 if getattr(sys, "frozen", False):
@@ -38,6 +51,49 @@ HTTP.mount("https://", _adapter)
 HTTP.mount("http://", _adapter)
 
 ACTIVE_SERVER_STATE = {"server_id": "en1"}
+LAST_SELECTED_TRAIN = {"train_num": None, "server_id": None}
+
+# ------------------- SERVER-TIJD CACHE -------------------
+SERVER_TIME_CACHE = {"epoch_ms": None, "server_id": None, "ts": 0}
+SERVER_TIME_LOCK = Lock()
+SERVER_TIME_REFRESH_INTERVAL = 15  # seconden
+
+
+def _server_time_refresh_loop():
+    while True:
+        server_id = ACTIVE_SERVER_STATE["server_id"]
+        try:
+            url = f"https://api1.aws.simrail.eu:8082/api/getTime?serverCode={server_id}"
+            response = HTTP.get(url, timeout=5)
+            unix_val = int(response.text.strip())
+            if unix_val < 10_000_000_000:
+                unix_val *= 1000
+            with SERVER_TIME_LOCK:
+                SERVER_TIME_CACHE.update({
+                    "epoch_ms": unix_val,
+                    "server_id": server_id,
+                    "ts": time.time()
+                })
+            set_log_context(server_id=server_id, server_time=get_cached_server_time_str())
+        except Exception as e:
+            cache_logger.warning(f"[server_time] Failed to refresh server time for {server_id}: {e}")
+        time.sleep(SERVER_TIME_REFRESH_INTERVAL)
+
+
+def get_cached_server_time_str():
+    with SERVER_TIME_LOCK:
+        epoch_ms = SERVER_TIME_CACHE.get("epoch_ms")
+        age = time.time() - SERVER_TIME_CACHE.get("ts", 0)
+
+    if epoch_ms is None:
+        return "unknown"
+
+    try:
+        dt = datetime.fromtimestamp(epoch_ms / 1000, tz=timezone.utc)
+        stale_marker = " [stale]" if age > SERVER_TIME_REFRESH_INTERVAL * 3 else ""
+        return f"{dt.strftime('%H:%M')}{stale_marker}"
+    except Exception:
+        return "unknown"
 
 TIMETABLE_TTL_CACHE = {}
 TIMETABLE_TTL_SECONDS = 60
@@ -69,7 +125,19 @@ def get_radio_db():
             return _radio_db_cache
     return {}
 
-def get_station_radio(station_name, radio_db):
+def get_station_radio(station_name, radio_db, _visited=None):
+ 
+    if _visited is None:
+        _visited = set()
+
+    if station_name in _visited:
+        request_logger.warning(
+            f"Cycle detected in supervisedBy chain for station '{station_name}' "
+            f"in radio database - stopping lookup to avoid infinite recursion."
+        )
+        return None
+    _visited.add(station_name)
+
     if station_name not in radio_db:
         return None
     
@@ -82,15 +150,33 @@ def get_station_radio(station_name, radio_db):
     # 2. Heeft het een moederstation? (Recursie voor ketens)
     parent = data.get('supervisedBy')
     if parent and parent in radio_db:
-        return get_station_radio(parent, radio_db)
+        return get_station_radio(parent, radio_db, _visited)
         
     return None
+
+def resolve_supervising_station(station_name, radio_db, _visited=None):
+
+    if _visited is None:
+        _visited = set()
+
+    if not station_name or station_name in _visited:
+        return station_name
+    _visited.add(station_name)
+
+    data = radio_db.get(station_name)
+    if not data:
+        return station_name
+
+    parent = data.get('supervisedBy')
+    if parent and parent in radio_db:
+        return resolve_supervising_station(parent, radio_db, _visited)
+
+    return station_name
 
 TIMETABLE_CACHE = {}
 
 def get_train_length_from_api(server_id, train_id):
-    """Haalt de exacte lengte op uit de SimRail Timetable API met caching"""
-    # Als we het al eens gevraagd hebben, geef het direct terug
+
     if train_id in TIMETABLE_CACHE:
         return TIMETABLE_CACHE[train_id]
         
@@ -105,7 +191,7 @@ def get_train_length_from_api(server_id, train_id):
             TIMETABLE_CACHE[train_id] = length # Opslaan in het geheugen
             return length
     except Exception as e:
-        print(f"Fout bij ophalen timetable voor {train_id}: {e}")
+        logger.warning(f"Failed to fetch timetable length for train {train_id}: {e}")
         
     return 200 # Fallback als de API offline is of herhaaldelijk faalt
 
@@ -121,7 +207,7 @@ def load_train_data():
     raw_list = None
 
     try:
-        print("[TRAIN_DB] Downloading latest train database...")
+        traindb_logger.info("Downloading latest train database...")
         response = HTTP.get(TRAIN_DB_URL, timeout=10)
         if response.status_code == 200:
             raw_list = response.json()
@@ -130,25 +216,27 @@ def load_train_data():
             with open(CACHE_FILE, "w", encoding="utf-8") as f:
                 json.dump(raw_list, f, ensure_ascii=False, indent=2)
 
-            print(f"[TRAIN_DB] Cache updated: {CACHE_FILE}")
+            traindb_logger.info(f"Cache updated: {CACHE_FILE}")
+        else:
+            traindb_logger.warning(f"Unexpected status {response.status_code} while downloading train database.")
 
     except Exception as e:
-        print(f"[TRAIN_DB] Online download failed: {e}")
+        traindb_logger.warning(f"Online download failed, falling back to local cache: {e}")
 
     # ==========================================================
     # 2. FALLBACK NAAR LOKALE CACHE
     # ==========================================================
     if raw_list is None:
         try:
-            print("[TRAIN_DB] Loading local cache...")
+            traindb_logger.info("Loading local cache...")
 
             with open(CACHE_FILE, "r", encoding="utf-8") as f:
                 raw_list = json.load(f)
 
-            print(f"[TRAIN_DB] Local cache loaded: {CACHE_FILE}")
+            traindb_logger.info(f"Local cache loaded: {CACHE_FILE}")
 
         except Exception as e:
-            print(f"[TRAIN_DB] Failed to load local cache: {e}")
+            traindb_logger.error(f"Failed to load local cache, starting without train database: {e}")
             raw_list = []
 
     # ==========================================================
@@ -162,7 +250,7 @@ def load_train_data():
 
     train_db = temp_db
 
-    print(f"[TRAIN_DB] Loaded {len(train_db)} train entries.")
+    traindb_logger.info(f"Loaded {len(train_db)} train entries.")
 
 def load_vehicles_db():
     global vehicles_db
@@ -170,37 +258,52 @@ def load_vehicles_db():
         try:
             with open(VEHICLES_FILE, 'r', encoding='utf-8') as f:
                 vehicles_db = json.load(f)
-            print(f"[VEHICLES_DB] Enriched vehicle database loaded successfully.")
+            vehicles_logger.info("Enriched vehicle database loaded successfully.")
         except Exception as e:
-            print(f"[VEHICLES_DB] Error loading enriched vehicle database: {e}")
+            vehicles_logger.error(f"Error loading enriched vehicle database: {e}")
+    else:
+        vehicles_logger.warning(f"Vehicle database file not found: {VEHICLES_FILE}")
 
 # ==========================================================================
 # ACHTERGROND-CACHE SYSTEEM (netwerk-optimalisatie)
 # ==========================================================================
 
+_cache_failure_streaks = {}  # cache_key -> aantal opeenvolgende mislukte pogingen
+
+
 def _cache_refresh_loop(cache_key, url_builder, interval, verify_ssl=True):
     while True:
         server_id = ACTIVE_SERVER_STATE["server_id"]
+        set_log_context(server_id=server_id)
         try:
             url = url_builder(server_id)
-            fetch_started = time.time()
             response = HTTP.get(url, timeout=5, verify=verify_ssl)
-            fetch_duration = time.time() - fetch_started
-            size_kb = len(response.content) / 1024
 
-            print(f"[CACHE:{cache_key}] {size_kb:.1f} KB in {fetch_duration:.2f}s "
-                  f"(status {response.status_code}, encoding={response.headers.get('Content-Encoding', 'none')}) "
-                  f"@ {time.strftime('%H:%M:%S')}")
-
-            if response.status_code == 200:
+            if response.status_code != 200:
+                _cache_failure_streaks[cache_key] = _cache_failure_streaks.get(cache_key, 0) + 1
+                cache_logger.warning(
+                    f"[{cache_key}] Unexpected status {response.status_code} while fetching "
+                    f"(attempt #{_cache_failure_streaks[cache_key]} in a row)"
+                )
+            else:
                 with CACHE_LOCK:
                     data_cache[cache_key] = {
                         "data": response.json(),
                         "server_id": server_id,
                         "ts": time.time()
                     }
+
+                if _cache_failure_streaks.get(cache_key):
+                    cache_logger.info(
+                        f"[{cache_key}] Recovered after {_cache_failure_streaks[cache_key]} failed attempt(s)"
+                    )
+                    _cache_failure_streaks[cache_key] = 0
         except Exception as e:
-            print(f"[CACHE:{cache_key}] Achtergrond-refresh mislukt: {e}")
+            _cache_failure_streaks[cache_key] = _cache_failure_streaks.get(cache_key, 0) + 1
+            cache_logger.warning(
+                f"[{cache_key}] Background refresh failed "
+                f"(attempt #{_cache_failure_streaks[cache_key]} in a row): {e}"
+            )
         time.sleep(interval)
 
 def start_background_loops():
@@ -223,7 +326,9 @@ def start_background_loops():
         60, True
     ), daemon=True).start()
 
-    print("[CACHE] Achtergrondloops gestart voor trains/stations/edr.")
+    Thread(target=_server_time_refresh_loop, daemon=True).start()
+
+    cache_logger.info("Background loops started for trains/stations/edr/server_time.")
 
 def get_cached_or_fetch(cache_key, url, server_id, verify_ssl=True, max_age=None):
 
@@ -246,7 +351,8 @@ def get_cached_or_fetch(cache_key, url, server_id, verify_ssl=True, max_age=None
             data_cache[cache_key] = {"data": data, "server_id": server_id, "ts": time.time()}
         return data
     except Exception as e:
-        print(f"[CACHE:{cache_key}] Fallback-fetch mislukt: {e}")
+        set_log_context(server_id=server_id)
+        cache_logger.warning(f"[{cache_key}] Fallback fetch failed: {e}")
         return entry.get("data")
 
 _RADAR_DB_CONN = None
@@ -391,10 +497,19 @@ def build_radar_path(start_signal_name, dist_to_start_signal, live_signal_speed,
                     current_signal = next_signal
 
         except Exception as e:
-            print(f"[ERROR] Radar path error: {e}")
+            radar_logger.error(f"Error building radar path from signal '{start_signal_name}': {e}")
 
     return map_elements
 # -------------------- ROUTES --------------------
+
+@app.errorhandler(Exception)
+def handle_uncaught_exception(e):
+
+    if isinstance(e, HTTPException):
+        return e
+
+    logger.error(f"Uncaught error on route {request.path}: {e}\n{traceback.format_exc()}")
+    return jsonify({"error": "Internal server error", "detail": str(e)}), 500
 
 @app.route('/')
 def index():
@@ -465,6 +580,10 @@ def health_check():
                 if overall_status == "online":
                     overall_status = "partial"
 
+    if overall_status != "online":
+        set_log_context(server_id=server_id)
+        health_logger.warning(f"Health check status={overall_status}: {results}")
+
     return jsonify({
         "overall": overall_status,
         "details": results
@@ -505,7 +624,17 @@ def get_train_data():
     if not train_num:
         return jsonify({"error": "No train number provided"}), 400
 
+    set_log_context(server_id=server_id)
+
+    previous_server = ACTIVE_SERVER_STATE["server_id"]
+    if previous_server != server_id:
+        request_logger.info(f"Active server switched: {previous_server} -> {server_id}")
     ACTIVE_SERVER_STATE["server_id"] = server_id
+
+    if LAST_SELECTED_TRAIN.get("train_num") != train_num or LAST_SELECTED_TRAIN.get("server_id") != server_id:
+        request_logger.info(f"Train {train_num} selected on server {server_id}")
+        LAST_SELECTED_TRAIN["train_num"] = train_num
+        LAST_SELECTED_TRAIN["server_id"] = server_id
 
     try:
         # 1. Haal Live Treinen Data op (voor basisinfo & overig verkeer)
@@ -637,15 +766,15 @@ def get_train_data():
         for idx, pt in enumerate(raw_timetable):
             name = pt.get('nameForPerson', '')
             stop_type_raw = pt.get('stopType', 'NoStopOver')
-            supervised_by = pt.get('supervisedBy')
-            
+            supervised_by_raw = pt.get('supervisedBy')
+            supervised_by = supervised_by_raw.strip() if supervised_by_raw else ""
+
+            dispatcher_lookup_name = resolve_supervising_station(name, radio_db)
+
             dispatcher_type = ""
-            if supervised_by:
-                dispatcher_type = "laptop"
-                if supervised_by in stations_dict:
-                    disp_info = stations_dict[supervised_by].get('DispatchedBy', [])
-                    if disp_info and len(disp_info) > 0:
-                        dispatcher_type = "user"
+            if dispatcher_lookup_name and dispatcher_lookup_name in stations_dict:
+                disp_info = stations_dict[dispatcher_lookup_name].get('DispatchedBy', [])
+                dispatcher_type = "user" if disp_info and len(disp_info) > 0 else "laptop"
 
             stop_type_display = "-"
             stop_duration_display = "-"
@@ -863,7 +992,7 @@ def get_train_data():
 
         berekende_seinen = []
         if live_signal_name:
-            print(f"[RADAR] Live sein: {live_signal_name} op {live_signal_dist}m. Sliert berekenen...")
+            radar_logger.debug(f"Live signal: {live_signal_name} at {live_signal_dist}m. Calculating chain...")
             berekende_seinen = build_radar_path(
                 start_signal_name=live_signal_name, 
                 dist_to_start_signal=live_signal_dist,
@@ -945,7 +1074,9 @@ def get_train_data():
         })
 
     except Exception as e:
-        print(f"Fout in get_train_data: {e}")
+        request_logger.error(
+            f"Error in get_train_data for train {train_num}: {e}\n{traceback.format_exc()}"
+        )
         return jsonify({"error": str(e)}), 500
 
 # -------------------- RUN --------------------

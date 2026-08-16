@@ -9,6 +9,7 @@ import webbrowser
 
 from update_checker import check_for_update
 from version import __version__
+from log_setup import set_debug_logging
 
 
 if getattr(sys, "frozen", False):
@@ -45,14 +46,15 @@ COLOR_ACCENT = "#3b82f6"      # primaire actieknoppen
 COLOR_ACCENT_HOVER = "#2563eb"
 COLOR_SUCCESS = "#22c55e"
 COLOR_DANGER = "#ef4444"
-COLOR_MONO_BG = "#0b1220"     # logboek-achtergrond
+COLOR_MONO_BG = "#000000"     # logboek-achtergrond (zuiver zwart, boot-sequence stijl)
+COLOR_MONO_TEXT = "#e6e6e6"   # logboek-tekstkleur (zacht wit, zoals een klassieke bootlog)
 
 FONT_BASE = ("Segoe UI", 10)
 FONT_MUTED = ("Segoe UI", 9)
 FONT_HEADING = ("Segoe UI Semibold", 15)
 FONT_SUBHEADING = ("Segoe UI", 9)
 FONT_SECTION = ("Segoe UI Semibold", 10)
-FONT_MONO = ("Consolas", 9)
+FONT_MONO = ("Consolas", 10)
 FONT_ADDRESS = ("Consolas", 12, "bold")
 
 
@@ -287,14 +289,31 @@ class ControlPanel(tk.Tk):
     def _build_log_section(self):
         card = self._card(self, fill="both", expand=True)
 
-        ttk.Label(card, text="LOG", style="Section.Card.TLabel").pack(anchor="w", padx=16, pady=(12, 6))
+        header_row = ttk.Frame(card, style="Card.TFrame")
+        header_row.pack(fill="x", padx=16, pady=(12, 6))
+
+        ttk.Label(header_row, text="LOG", style="Section.Card.TLabel").pack(side="left")
+
+        # Klein, onopvallend vinkje om DEBUG-logging live aan/uit te zetten
+        # zonder herstart. Staat bewust bescheiden rechts naast de LOG-titel
+        # i.p.v. in een apart menu, zodat het niet in de weg zit maar wel
+        # vindbaar is voor wie ernaar zoekt.
+        self.debug_log_var = tk.BooleanVar(value=False)
+        debug_check = tk.Checkbutton(
+            header_row, text="Debug logging", variable=self.debug_log_var,
+            command=self._toggle_debug_logging,
+            bg=COLOR_CARD, fg=COLOR_TEXT_MUTED, activebackground=COLOR_CARD,
+            activeforeground=COLOR_TEXT_MUTED, selectcolor=COLOR_CARD_BORDER,
+            font=FONT_MUTED, borderwidth=0, highlightthickness=0, cursor="hand2",
+        )
+        debug_check.pack(side="right")
 
         text_wrap = tk.Frame(card, bg=COLOR_MONO_BG)
         text_wrap.pack(fill="both", expand=True, padx=16)
 
         self.log_text = scrolledtext.ScrolledText(
             text_wrap, state="disabled", wrap="word", height=14,
-            bg=COLOR_MONO_BG, fg=COLOR_TEXT, insertbackground=COLOR_TEXT,
+            bg=COLOR_MONO_BG, fg=COLOR_MONO_TEXT, insertbackground=COLOR_MONO_TEXT,
             font=FONT_MONO, borderwidth=0, highlightthickness=0,
         )
         self.log_text.pack(fill="both", expand=True, padx=1, pady=1)
@@ -303,6 +322,9 @@ class ControlPanel(tk.Tk):
             card, text="Export to file", style="Secondary.TButton", command=self._export_log
         )
         export_btn.pack(anchor="e", padx=16, pady=12)
+
+    def _toggle_debug_logging(self):
+        set_debug_logging(self.debug_log_var.get())
 
     def _poll_log(self):
         if os.path.exists(self.log_path):

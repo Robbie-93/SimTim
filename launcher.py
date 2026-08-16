@@ -51,7 +51,13 @@ class ServerManager:
     def start(self):
         if self._running:
             return
-        self._server = create_server(self.flask_app, host=self.host, port=self.port)
+        # Standaard geeft waitress maar 4 worker-threads. Aangezien elke
+        # /api/data-aanvraag meerdere synchrone calls naar de SimRail-API kan
+        # doen (en de frontend elke ~2s pollt, eventueel vanaf meerdere
+        # LAN-clients tegelijk), kan dat aantal te krap zijn en requests laten
+        # opstapelen ("Task queue depth is N" in het log). 8 threads geeft
+        # ruimte zonder de host-pc onnodig te belasten.
+        self._server = create_server(self.flask_app, host=self.host, port=self.port, threads=8)
         self._thread = threading.Thread(target=self._server.run, daemon=True)
         self._thread.start()
         self._running = True
