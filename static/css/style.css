@@ -482,12 +482,20 @@ body {
 
 .consist-row {
     display: grid;
-    grid-template-columns: 40px 80px 1fr 80px 120px 80px 80px;
+    grid-template-columns: 3ch minmax(0, 10ch) minmax(0, 1fr) 7ch minmax(0, 1fr) 7ch 9ch;
+    column-gap: 8px;
     align-items: center;
     padding: 8px 15px;
     border-bottom: 1px solid #222;
     font-size: 0.9em;
     box-sizing: border-box;
+}
+
+.consist-row > div {
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 
 .consist-row:hover {

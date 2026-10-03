@@ -3366,22 +3366,22 @@
     "manual_override": true
   },
   "Jackowice": {
-    "radio": "",
+    "radio": "R3",
     "supervisedBy": null,
     "manual_override": true
   },
   "Żychlin": {
     "radio": "",
-    "supervisedBy": null,
+    "supervisedBy": "Jackowice",
     "manual_override": true
   },
   "Stara Wieś koło Kutna": {
-    "radio": "",
+    "radio": "R3",
     "supervisedBy": null,
     "manual_override": true
   },
   "Kutno": {
-    "radio": "",
+    "radio": "R2, R3, R4",
     "supervisedBy": null,
     "manual_override": true
   },

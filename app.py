@@ -9,7 +9,7 @@ import sys
 import logging
 import traceback
 from datetime import datetime, timedelta, timezone
-from flask import Flask, jsonify, render_template, request
+from flask import Flask, jsonify, render_template, request, send_from_directory
 from threading import Thread, Lock
 from werkzeug.exceptions import HTTPException
 from log_setup import set_log_context
@@ -41,6 +41,7 @@ data_cache = {
     "trains": {"data": None, "server_id": None, "ts": 0},
     "stations": {"data": None, "server_id": None, "ts": 0},
     "edr": {"data": None, "server_id": None, "ts": 0},
+    "servers": {"data": None, "server_id": None, "ts": 0},
 }
 CACHE_LOCK = Lock()
 
@@ -198,7 +199,7 @@ def get_train_length_from_api(server_id, train_id):
 train_db = {}
 CACHE_DIR = DATA_DIR
 CACHE_FILE = os.path.join(CACHE_DIR, "train_db.json")
-TRAIN_DB_URL = "https://wiki.simrail.eu/tips_tricks/spawnlist/maping_2025_processed.json"
+TRAIN_DB_URL = "https://wiki.simrail.eu/tips_tricks/spawnlist/maping_2026_processed.json"
 
 def load_train_data():
     global train_db
@@ -515,6 +516,10 @@ def handle_uncaught_exception(e):
 def index():
     return render_template('index.html')
 
+@app.route('/favicon.ico')
+def favicon():
+    return send_from_directory(app.root_path, 'icon.ico', mimetype='image/vnd.microsoft.icon')
+
 @app.route('/api/status')
 def status_ping():
     return {"status": "ok"}, 200
@@ -592,7 +597,7 @@ def health_check():
 @app.route('/api/servers')
 def get_servers():
     url = "https://panel.simrail.eu:8084/servers-open"
-    res = HTTP.get(url, timeout=5, verify=False).json()
+    res = get_cached_or_fetch("servers", url, "global", verify_ssl=False, max_age=30) or {}
     return jsonify(res)
 
 @app.route('/api/server_time')
@@ -611,8 +616,14 @@ def get_server_time():
 @app.route('/api/timezone')
 def get_timezone():
     server_id = request.args.get('server')
-    res = HTTP.get(f"https://api1.aws.simrail.eu:8082/api/getTimeZone?serverCode={server_id}")
-    return jsonify({"timezone": res.text.strip()})
+    try:
+        res = HTTP.get(
+            f"https://api1.aws.simrail.eu:8082/api/getTimeZone?serverCode={server_id}",
+            timeout=5
+        )
+        return jsonify({"timezone": res.text.strip()})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
 @app.route('/api/data')

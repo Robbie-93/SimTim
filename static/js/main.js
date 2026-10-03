@@ -28,6 +28,8 @@ const state = {
 let themes = ['night', 'dusk', 'day'];
 let themeIndex = 0;
 
+let _syncInFlight = false;
+let _healthInFlight = false;
 let serverTime = null;
 let lastSync = null;
 let lastApiData = null;
@@ -323,6 +325,12 @@ window.closeCMD = function() {
 async function syncActiveData() {
     if (!state.train || !state.server || !state.confirmed) return null;
 
+    if (_syncInFlight) {
+        console.warn("[Sync] Skipping poll: previous request still in flight");
+        return null;
+    }
+    _syncInFlight = true;    
+
     try {
         console.log(`[Sync] Fetching data for: ${state.server} / ${state.train}`);
         
@@ -352,6 +360,8 @@ async function syncActiveData() {
     } catch (e) {
         console.error("Fout tijdens data sync:", e);
         return null;
+    } finally {
+        _syncInFlight = false;
     }
 }
 
@@ -405,6 +415,9 @@ function tickLocalClock() {
 }
 
 async function syncDiagnosticsHealth() {
+    if (_healthInFlight) return;
+    _healthInFlight = true;
+
     try {
         const data = await SimRailAPI.getSystemHealth(state.server, state.train);
         lastApiData = data.details;
@@ -412,6 +425,8 @@ async function syncDiagnosticsHealth() {
     } catch (error) {
         SimRailUI.setStatus('offline');
         lastApiData = { "Systeem-Server": "offline" };
+    } finally {
+        _healthInFlight = false;
     }
 }
 

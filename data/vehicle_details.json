@@ -111,6 +111,13 @@
       "service_weight": 98.05,
       "max_weight": null,
       "power": 1200
+    },
+    "BR285": {
+      "name": "BR285",
+      "vmax": 140,
+      "service_weight": 82,
+      "max_weight": 2040,
+      "power": 2200
     }
   },
   "wagons": {

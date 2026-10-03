@@ -441,6 +441,44 @@ renderMap(data) {
                     ctx.fillText(el.dist + "m", textX, y + 15);
                 }
                 // ==================================================================
+                // SPEED CHANGE-LAAG
+                // ==================================================================
+                else if (el.type === 'speed_change') {
+                    // Links van het spoor, spiegel van de montagesteun aan de rechterkant
+                    const shieldX = centerX - 20;
+                    const isIncrease = el.to > el.from;
+                    const triangleColor = getComputedStyle(document.body)
+                        .getPropertyValue('--accent-color').trim() || '#facc15';
+                    const textColor = getComputedStyle(document.body)
+                        .getPropertyValue('--text-color').trim() || '#e2e8f0';
+
+                    ctx.save();
+
+                    // Driehoek: punt omhoog bij toename, omlaag bij afname
+                    ctx.beginPath();
+                    if (isIncrease) {
+                        ctx.moveTo(shieldX, y - 6);
+                        ctx.lineTo(shieldX - 6, y + 5);
+                        ctx.lineTo(shieldX + 6, y + 5);
+                    } else {
+                        ctx.moveTo(shieldX, y + 6);
+                        ctx.lineTo(shieldX - 6, y - 5);
+                        ctx.lineTo(shieldX + 6, y - 5);
+                    }
+                    ctx.closePath();
+                    ctx.fillStyle = triangleColor;
+                    ctx.fill();
+
+                    // Snelheid: spoorwegconventie, gedeeld door 10 (100 km/h -> "10")
+                    ctx.font = 'bold 11px "Courier New", Courier, monospace';
+                    ctx.textAlign = 'right';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillStyle = textColor;
+                    ctx.fillText(String(Math.round(el.to / 10)), shieldX - 10, y);
+
+                    ctx.restore();
+                }
+                // ==================================================================
                 // TRAFFIC-LAAG
                 // ==================================================================
                 else if (el.type === 'traffic') {
