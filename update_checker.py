@@ -27,10 +27,22 @@ def check_for_update(timeout=5):
         latest_tag = data.get("tag_name", "")
         latest_url = data.get("html_url", "")
         update_available = _parse_version(latest_tag) > _parse_version(__version__)
+        # Downloadbare bestanden van de release (bv. SimTim.zip), nodig voor
+        # de directe download vanuit de update-popup.
+        assets = [
+            {
+                "name": a.get("name", ""),
+                "url": a.get("browser_download_url", ""),
+                "size": a.get("size", 0),
+            }
+            for a in data.get("assets", [])
+            if a.get("browser_download_url")
+        ]
         return {
             "update_available": update_available,
             "latest": latest_tag,
             "url": latest_url,
+            "assets": assets,
         }
     except (requests.RequestException, ValueError, KeyError):
         return None

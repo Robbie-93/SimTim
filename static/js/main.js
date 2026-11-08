@@ -22,7 +22,9 @@ const state = {
     // typen is, en pas true na confirmNum(). Voorkomt dat de periodieke
     // syncActiveData-interval (elke 2s) al data ophaalt op basis van een
     // nog niet-bevestigd, gedeeltelijk ingetypt treinnummer.
-    confirmed: true
+    confirmed: true,
+    // Treinnummer dat actief was voordat het numpad openging; wordt hersteld bij lege invoer
+    prevTrain: ""
 };
 
 let themes = ['night', 'dusk', 'day'];
@@ -30,12 +32,14 @@ let themeIndex = 0;
 
 let _syncInFlight = false;
 let _healthInFlight = false;
+let _healthPending = false; // refresh gevraagd terwijl er al een check liep
 let serverTime = null;
 let lastSync = null;
 let lastApiData = null;
 let syncIntervalId = null;
 
 let _bootStarted = false;
+let _confirmInFlight = false;
 
 /* ================== BOOT ENTRY ================== */
 document.addEventListener('DOMContentLoaded', () => {
@@ -131,6 +135,8 @@ select?.addEventListener('change', (e) => {
     }, 100);
 
     syncServerClockTime();
+    // API-status direct verversen voor de nieuwe server
+    syncDiagnosticsHealth();
 });
 
     window.addEventListener('offline', () => SimRailUI.setStatus('offline'));
@@ -177,12 +183,9 @@ function handleTrainClick() {
         document.getElementById('train-label').innerText = "Select a server first";
         return;
     }
-    
-    if (syncIntervalId) {
-        clearInterval(syncIntervalId);
-        syncIntervalId = null;
-        SimRailUI.logToCMD(`SYNC_STOP: Oude tracking stopgezet voor invoer`, 'info');
-    }
+
+    // Vorige trein onthouden; polling pauzeert zolang confirmed false is
+    if (state.confirmed && state.train) state.prevTrain = state.train;
 
     state.train = ""; 
     state.confirmed = false;
@@ -203,101 +206,120 @@ function clearNum() {
 
 async function confirmNum() {
     document.getElementById('numpad').style.display = 'none';
-    if (!state.train) return;
 
-    state.confirmed = true;
+    // Dubbel tikken: tweede sequentie negeren zolang de eerste loopt
+    if (_confirmInFlight) return;
 
-    const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+    // Lege invoer: vorige trein herstellen en gewoon verder pollen
+    if (!state.train) {
+        state.train = state.prevTrain || "";
+        state.confirmed = true;
+        SimRailUI.updateTrainLabel(state);
+        console.log(`[Confirm] Empty input, restored previous train: ${state.train || 'none'}`);
+        return;
+    }
+
+    _confirmInFlight = true;
+    // confirmed blijft false tot de trein gevonden is, zodat de 2s-interval niet meeloopt
+    state.confirmed = false;
+
+    const server = state.server;
+    const train = state.train;
+    const serverLabel = server.toUpperCase();
+    const footer = document.getElementById('cmd-footer');
+
+    // Leesbare foutmelding voor fetch-fouten (timeout of backend onbereikbaar)
+    const describeFetchError = (err) => {
+        if (err && err.name === 'AbortError') return 'Connection timed out';
+        if (err instanceof TypeError) return 'SimTim backend not reachable';
+        return (err && err.message) ? err.message : String(err);
+    };
+
+    // Mislukte invoer: alles leegmaken en niet verder pollen
+    const failAndReset = () => {
+        state.train = "";
+        state.prevTrain = "";
+        state.trainType = "-";
+        state.confirmed = true; // geen trein = interval doet niets
+        SimRailUI.clearDashboard();
+        SimRailUI.updateTrainLabel(state);
+        SimRailUI.setStatus('offline');
+    };
 
     try {
         SimRailUI.setStatus('loading');
-        
-        const dataPromise = syncActiveData();
-        
-        // STAP 1: Connecting to server
-        SimRailUI.logToCMD(`Connecting to server (${state.server.toUpperCase()})`, 'white', true);
-        await sleep(200); 
+        if (footer) footer.style.display = 'none';
 
-        // STAP 2: Connected to server
-        SimRailUI.logToCMD(`Connected to server (${state.server.toUpperCase()})`, 'green');
-        await sleep(200);
+        // STAP 1 + 2: echte verbindingscheck met de gekozen SimRail-server
+        SimRailUI.logToCMD(`Connecting to server (${serverLabel})`, 'white', true);
+        let timeRes;
+        try {
+            timeRes = await SimRailAPI.getServerTime(server);
+        } catch (err) {
+            SimRailUI.logToCMD(`Not connected to server (${serverLabel})`, 'error');
+            SimRailUI.logToCMD(`ERROR: ${describeFetchError(err)}`, 'error');
+            console.error('[Confirm] Server connection failed:', err);
+            failAndReset();
+            return;
+        }
+        if (!timeRes || timeRes.error) {
+            SimRailUI.logToCMD(`Not connected to server (${serverLabel})`, 'error');
+            SimRailUI.logToCMD(`ERROR: ${timeRes?.error || 'No response from SimRail'}`, 'error');
+            console.error('[Confirm] Server time check returned error:', timeRes);
+            failAndReset();
+            return;
+        }
+        SimRailUI.logToCMD(`Connected to server (${serverLabel})`, 'green');
 
-        // STAP 3: Input train number
-        SimRailUI.logToCMD(`Input train number (${state.train})`, 'white');
-        await sleep(200);
+        // STAP 3: treinnummer
+        SimRailUI.logToCMD(`Input train number (${train})`, 'white');
 
-        // API Aanroep
-        const data = await dataPromise;
-
-        // STAP 4: Train found check
-        if (data && !data.error) {
-            SimRailUI.logToCMD(`Train ${state.train} found`, 'green');
-            await sleep(200);
-        } else {
-            SimRailUI.logToCMD(`Train ${state.train} not found`, 'error');
-            throw new Error("Train not found on server");
+        // STAP 4: trein opvragen (eigen request, los van de interval-poll)
+        let result;
+        try {
+            result = await SimRailAPI.getTrainDataWithStatus(server, train);
+        } catch (err) {
+            SimRailUI.logToCMD(`ERROR: ${describeFetchError(err)}`, 'error');
+            console.error('[Confirm] Train data request failed:', err);
+            failAndReset();
+            return;
         }
 
-        // STAP 5: Retrieving data
+        if (result.status === 404) {
+            SimRailUI.logToCMD(`Train ${train} not found`, 'error');
+            if (result.data?.error) SimRailUI.logToCMD(result.data.error, 'sub');
+            console.warn(`[Confirm] Train ${train} not found: ${result.data?.error}`);
+            failAndReset();
+            return;
+        }
+        if (!result.ok || !result.data || result.data.error) {
+            SimRailUI.logToCMD(`ERROR: ${result.data?.error || 'Unknown error'} (HTTP ${result.status})`, 'error');
+            console.error('[Confirm] Train data error:', result);
+            failAndReset();
+            return;
+        }
+        SimRailUI.logToCMD(`Train ${train} found`, 'green');
+
+        // STAP 5: ontvangen data verwerken in dashboard, kaart, rittenstaat en info
         SimRailUI.logToCMD(`Retrieving data`, 'white');
-        await sleep(200);
+        SimRailUI.clearDashboard(); // restanten van de vorige trein weg
+        applyTrainData(result.data);
 
-        // --- HIER KOMEN DE SUGGESTIES ALS SUB-REGELS ---
-        
-        // 1. De Route
-        SimRailUI.logToCMD(`MAPPING_ROUTE: ${data.route || 'UNKNOWN TRAJECTORY'}`, 'sub');
-        
-        // 2. Het Treintype
-        const typeZonderStreepje = data.train_type || data.trainType || 'COMMUTER';
-        SimRailUI.logToCMD(`TRAIN_TYPE: ${typeZonderStreepje}`, 'sub');
-        
-        // 3. Vertraging met status-tekst
-        const delayVal = parseInt(data.delay) || 0;
-        let delayStatus = "ON TIME";
-        if (delayVal > 0) delayStatus = `+${delayVal} MIN DELAY`;
-        if (delayVal < 0) delayStatus = `${delayVal} MIN AHEAD`;
-        SimRailUI.logToCMD(`START_STATUS: ${delayStatus}`, 'sub');
-
-        // 4. Aantal stations in de timetable tellen
-        const totalStops = (data.timetable && data.timetable.length) || 0;
-        SimRailUI.logToCMD(`TIMETABLE: ${totalStops} scheduled entries compiled`, 'sub');
-
-        const timetableContainer = document.getElementById('timetable-scroll-area');
-        if (timetableContainer) {
-            timetableContainer.innerHTML = '';
-            
-            const oudePinnedHeader = timetableContainer.parentElement.querySelector('.pinned-final-destination');
-            if (oudePinnedHeader) {
-                oudePinnedHeader.remove();
-            }
-        }
-
-        SimRailUI.renderTimetable(data.timetable, data.game_end_station, { serverTime: getCurrentServerTimeHHMM() });
-        
-        // 5. Eerstvolgende stop bepalen (als er een timetable is)
-        if (data.timetable && data.timetable.length > 0) {
-            // Zoek naar de stop die gemarkeerd staat als 'is_next'
-            const nextStop = data.timetable.find(s => s.is_next) || data.timetable[0];
-            if (nextStop && nextStop.name) {
-                SimRailUI.logToCMD(`NEXT_STOP: ${nextStop.name} (Track ${nextStop.track || '?'})`, 'sub');
-            }
-        }
-
-        await sleep(200);
-
-        // STAP 6: All data received
+        // STAP 6: klaar, interval mag weer pollen
+        state.confirmed = true;
+        state.prevTrain = train;
         SimRailUI.logToCMD(`All data received`, 'white');
-        
-        // Afronden en knop tonen
         SimRailUI.setStatus('online');
-        const footer = document.getElementById('cmd-footer');
-        if (footer) footer.style.display = 'block';
 
     } catch (err) {
-        SimRailUI.logToCMD(`FATAL_EXCEPTION: CONNECTION TERMINATED`, 'error');
-        const footer = document.getElementById('cmd-footer');
-        if (footer) footer.style.display = 'block';
-        SimRailUI.setStatus('offline');
+        // Onverwachte fout (bijv. in het renderen)
+        SimRailUI.logToCMD(`ERROR: ${err?.message || err}`, 'error');
+        console.error('[Confirm] Unexpected error:', err);
+        failAndReset();
+    } finally {
+        _confirmInFlight = false;
+        if (footer) footer.style.display = 'block';        // Icoon en API STATUS direct gelijktrekken met de werkelijke verbindingsstatus
+        syncDiagnosticsHealth();
     }
 }
 
@@ -329,12 +351,22 @@ async function syncActiveData() {
         console.warn("[Sync] Skipping poll: previous request still in flight");
         return null;
     }
-    _syncInFlight = true;    
+    _syncInFlight = true;
+
+    // Trein/server van dit request vastleggen, om verouderde antwoorden te herkennen
+    const reqTrain = state.train;
+    const reqServer = state.server;
 
     try {
-        console.log(`[Sync] Fetching data for: ${state.server} / ${state.train}`);
+        console.log(`[Sync] Fetching data for: ${reqServer} / ${reqTrain}`);
         
-        const data = await SimRailAPI.getTrainData(state.server, state.train);
+        const data = await SimRailAPI.getTrainData(reqServer, reqTrain);
+
+        // Inmiddels andere trein gekozen of invoer bezig: dit antwoord niet meer tonen
+        if (state.train !== reqTrain || state.server !== reqServer || !state.confirmed) {
+            console.log(`[Sync] Discarding stale response for ${reqServer} / ${reqTrain}`);
+            return null;
+        }
 
         if (data.error) {
             console.warn("[Sync] Server returned error:", data.error);
@@ -342,19 +374,7 @@ async function syncActiveData() {
         }
 
         console.log("[Sync] Data received successfully.");
-
-        if (data.server_time_unix && !serverTime) {
-            serverTime = new Date(data.server_time_unix * 1000);
-            lastSync = Date.now();
-        }
-
-        // Update Dashboard
-        SimRailUI.updateDashboardFields(data);
-        state.trainType = data.train_type || "-";
-        SimRailUI.updateTrainLabel(state);
-        SimRailUI.renderMap(data);  
-        SimRailUI.renderTimetable(data.timetable, data.game_end_station, { serverTime: getCurrentServerTimeHHMM() });
-        SimRailUI.updateInfoView(data);
+        applyTrainData(data);
         
         return data;
     } catch (e) {
@@ -362,6 +382,28 @@ async function syncActiveData() {
         return null;
     } finally {
         _syncInFlight = false;
+    }
+}
+
+/* Verwerkt een treindata-response in alle UI-onderdelen (gedeeld door sync en confirmNum) */
+function applyTrainData(data) {
+    if (data.server_time_unix && !serverTime) {
+        serverTime = new Date(data.server_time_unix * 1000);
+        lastSync = Date.now();
+    }
+
+    SimRailUI.updateDashboardFields(data);
+    state.trainType = data.train_type || "-";
+    SimRailUI.updateTrainLabel(state);
+    // Eerst bijhouden of er een volgend sein is, zodat renderMap de banner meteen meeneemt
+    SimRailUI.updateSignalLoss(data);
+    SimRailUI.renderMap(data);  
+    SimRailUI.renderTimetable(data.timetable, data.game_end_station, { serverTime: getCurrentServerTimeHHMM() });
+    SimRailUI.updateInfoView(data);
+
+    // Perronwijziging t.o.v. dienstregeling: popup (één keer per spoor/perron)
+    if (data.platform_notice) {
+        SimRailUI.showPlatformNotice(data.platform_notice, state.train);
     }
 }
 
@@ -415,18 +457,35 @@ function tickLocalClock() {
 }
 
 async function syncDiagnosticsHealth() {
-    if (_healthInFlight) return;
+    // Loopt er al een check of is confirmNum bezig: refresh onthouden en straks alsnog uitvoeren
+    if (_healthInFlight || _confirmInFlight) {
+        _healthPending = true;
+        return;
+    }
     _healthInFlight = true;
 
     try {
         const data = await SimRailAPI.getSystemHealth(state.server, state.train);
-        lastApiData = data.details;
-        SimRailUI.setStatus(data.overall);
+
+        // Host = de SimTim-backend zelf; bereikbaar want er kwam antwoord
+        const details = (data && data.details) ? data.details : {};
+        lastApiData = { "Host": "online", ...details };
+
+        const overall = ['online', 'partial', 'offline'].includes(data?.overall) ? data.overall : 'partial';
+        SimRailUI.setStatus(overall);
+        if (overall !== 'online') console.warn(`[Health] ${new Date().toLocaleTimeString([], { hour12: false })} Status ${overall}:`, lastApiData);
     } catch (error) {
+        // Backend niet bereikbaar: de overige checks zijn dan onbekend
+        console.error(`[Health] ${new Date().toLocaleTimeString([], { hour12: false })} SimTim backend not reachable:`, error);
+        lastApiData = { "Host": "offline" };
         SimRailUI.setStatus('offline');
-        lastApiData = { "Systeem-Server": "offline" };
     } finally {
         _healthInFlight = false;
+        // Was er tussendoor een refresh gevraagd, dan direct een verse check met de actuele trein
+        if (_healthPending && !_confirmInFlight) {
+            _healthPending = false;
+            syncDiagnosticsHealth();
+        }
     }
 }
 

@@ -118,3 +118,74 @@
     background: #666;
     transform: scale(0.97);
 }
+
+/* ----- DISPATCH NOTICE (PERRONWIJZIGING) ----- */
+/* Zelfde omlijning als het numpad; boven de CMD-terminal zodat hij nooit verstopt zit.
+   Eén lettergrootte; hiërarchie alleen via kleur en gewicht. */
+#platform-notice {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+    background: #333;
+    padding: 20px;
+    border-radius: 10px;
+    border: 2px solid var(--accent-color);
+    width: 350px;
+    max-width: calc(100vw - 32px);
+    box-sizing: border-box;
+    z-index: 10002;
+    color: #eee;
+    font-family: 'Consolas', 'Courier New', monospace;
+    font-size: 14px;
+    line-height: 1.6;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+#platform-notice .pn-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--accent-color);
+    font-weight: bold;
+    border-bottom: 1px solid #555;
+    padding-bottom: 10px;
+    margin-bottom: 12px;
+}
+
+#platform-notice .pn-icon { width: 16px; height: 16px; flex-shrink: 0; }
+#platform-notice .pn-intro { color: #aaa; margin-bottom: 8px; }
+#platform-notice .pn-intro span { color: #eee; }
+
+#platform-notice .pn-grid {
+    display: grid;
+    grid-template-columns: 90px 1fr;
+    row-gap: 2px;
+}
+
+#platform-notice .pn-key { color: #aaa; }
+#platform-notice .pn-strong { font-weight: bold; }
+#platform-notice .pn-changed { color: var(--accent-color); font-weight: bold; }
+#platform-notice .pn-muted { color: #888; }
+
+#platform-notice .pn-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 16px;
+    border-top: 1px solid #555;
+    padding-top: 12px;
+}
+
+#platform-notice .pn-footer button {
+    padding: 8px 20px;
+    background: #444;
+    color: white;
+    border: 1px solid #666;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 14px;
+}
+#platform-notice .pn-footer button:active { background: #666; }

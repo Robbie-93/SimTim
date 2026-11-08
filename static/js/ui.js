@@ -52,6 +52,7 @@ const SimRailUI = {
 
                 if (status === "online") { color = "#008000"; msg = "ONLINE"; }
                 else if (status === "error") { color = "#ffaa00"; msg = "SOMETHING WENT WRONG"; }
+                else if (status === "standby") { color = "#888888"; msg = "STANDBY"; }
 
                 const row = document.createElement('div');
                 row.style.cssText = "display: flex; justify-content: space-between; margin-bottom: 10px; padding-bottom: 5px; border-bottom: 1px solid #222; font-family: 'Courier New', monospace; font-size: 13px;";
@@ -91,6 +92,249 @@ const SimRailUI = {
         } else {
             type.classList.add("hidden");
         }
+    },
+
+    /* Zet dashboard, kaart, rittenstaat en info-view terug naar de lege beginstand */
+    clearDashboard() {
+        const vAct = document.getElementById('v-act');
+        const route = document.getElementById('route-id');
+        const delayEl = document.getElementById('delay');
+        if (vAct) vAct.innerText = '0';
+        if (route) route.innerText = '-';
+        if (delayEl) {
+            delayEl.innerText = '0';
+            delayEl.style.color = 'var(--text-color)';
+        }
+
+        // Kaart leegmaken en cache wissen, zodat de knipper-loop niets oud meer tekent
+        this._lastMapData = null;
+        const canvas = document.getElementById('mapCanvas');
+        if (canvas) {
+            const ctx = canvas.getContext('2d');
+            ctx.setTransform(1, 0, 0, 1, 0, 0);
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+
+        // Rittenstaat leeg (renderTimetable toont dan 'No timetable active.' en verwijdert de pinned header)
+        this.renderTimetable([], null);
+        const destVal = document.getElementById('game-end-station-val');
+        if (destVal) destVal.innerText = '-';
+
+        // Info-view leeg en geheugen resetten, zodat een volgende trein opnieuw rendert
+        const infoContainer = document.getElementById('info-scroll-area');
+        if (infoContainer) infoContainer.innerHTML = '';
+        lastLoadedTrainNumber = null;
+
+        // Openstaande perronmelding sluiten en geheugen wissen
+        this.closePlatformNotice();
+        this._platformNoticeShown.clear();
+
+        // Seindata-melding uit (nieuwe trein begint schoon)
+        this.clearSignalLoss();
+    },
+
+    /* ===== DISPATCH NOTICE (perronwijziging) ===== */
+    _platformNoticeShown: new Set(), // "trein|notice-key" die al getoond zijn
+    _platformNoticeTimer: null,
+    _platformNoticeSeconds: 15,
+
+    /* Toont de melding één keer per trein + gedetecteerd spoor/perron */
+    showPlatformNotice(notice, trainNumber) {
+        if (!notice || !notice.key) return;
+
+        const shownKey = `${trainNumber}|${notice.key}`;
+        if (this._platformNoticeShown.has(shownKey)) return;
+        this._platformNoticeShown.add(shownKey);
+
+        const popup = document.getElementById('platform-notice');
+        if (!popup) return;
+
+        // Rij tonen of verbergen (label + waarde); html-waarde wordt veilig opgebouwd
+        const esc = (v) => String(v ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+        const setRow = (keyId, valId, html) => {
+            const keyEl = keyId ? document.getElementById(keyId) : null;
+            const valEl = document.getElementById(valId);
+            const show = !!html;
+            if (keyEl) keyEl.style.display = show ? '' : 'none';
+            if (valEl) {
+                valEl.innerHTML = html || '';
+                valEl.style.display = show ? '' : 'none';
+            }
+        };
+
+        // Gewijzigde waarde in accentkleur, met de dienstregelingswaarde gedimd erachter
+        const fmtChange = (detected, planned) => {
+            if (!detected) return null;
+            const changed = planned && String(planned) !== String(detected);
+            return changed
+                ? `<span class="pn-changed">${esc(detected)}</span> <span class="pn-muted">(was ${esc(planned)})</span>`
+                : esc(detected);
+        };
+
+        const side = notice.side === 'L' ? 'Left side'
+                   : notice.side === 'R' ? 'Right side'
+                   : null;
+
+        const trainEl = document.getElementById('pn-train');
+        if (trainEl) trainEl.innerText = trainNumber || '';
+        setRow(null, 'pn-station', esc(notice.station));
+        setRow('pn-track-key', 'pn-track', fmtChange(notice.track, notice.tt_track));
+        setRow('pn-platform-key', 'pn-platform', fmtChange(notice.platform, notice.tt_platform));
+        setRow('pn-side-key', 'pn-side', side ? esc(side) : null);
+        const location = `track ${notice.track || '-'}, platform ${notice.platform || '-'}`;
+
+        popup.style.display = 'block';
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+        console.log(`[Platform] ${new Date().toLocaleTimeString([], { hour12: false })} Notice shown for train ${trainNumber}: ${notice.station} ${location} (signal ${notice.signal})`);
+
+        // Aftellen en automatisch sluiten
+        clearInterval(this._platformNoticeTimer);
+        let remaining = this._platformNoticeSeconds;
+        const countdown = document.getElementById('pn-countdown');
+        if (countdown) countdown.innerText = `Closing in ${remaining} s`;
+
+        this._platformNoticeTimer = setInterval(() => {
+            remaining -= 1;
+            if (remaining <= 0) {
+                this.closePlatformNotice();
+                return;
+            }
+            if (countdown) countdown.innerText = `Closing in ${remaining} s`;
+        }, 1000);
+    },
+
+    /* Sluit de melding (ACKNOWLEDGE of timer) */
+    closePlatformNotice() {
+        clearInterval(this._platformNoticeTimer);
+        this._platformNoticeTimer = null;
+        const popup = document.getElementById('platform-notice');
+        if (popup) popup.style.display = 'none';
+    },
+
+    /* ===== SIGNAL DATA LOST (banner op de Look Ahead-kaart) ===== */
+    _signalLoss: { missStreak: 0, active: false, since: null, timer: null },
+    _SIGNAL_LOSS_MIN_POLLS: 2, // pas na 2 polls op rij zonder sein (~4 s), voorkomt geflikker
+
+    /* Per poll aanroepen: houdt bij of de API een volgend sein meestuurt */
+    updateSignalLoss(data) {
+        const sl = this._signalLoss;
+        const hasSignal = !!(data && data.signal && data.signal.name);
+        const ts = () => new Date().toLocaleTimeString([], { hour12: false });
+
+        if (hasSignal) {
+            if (sl.active) {
+                console.log(`[Signal] ${ts()} Signal data restored after ${this._formatElapsed(Date.now() - sl.since)}`);
+            }
+            this.clearSignalLoss();
+            return;
+        }
+
+        sl.missStreak += 1;
+        if (!sl.active && sl.missStreak >= this._SIGNAL_LOSS_MIN_POLLS) {
+            sl.active = true;
+            sl.since = Date.now();
+            console.warn(`[Signal] ${ts()} Signal data lost - no SignalInFront received for ${sl.missStreak} polls`);
+            // Elke seconde opnieuw tekenen zodat de teller loopt (polls komen maar elke 2 s)
+            clearInterval(sl.timer);
+            sl.timer = setInterval(() => {
+                if (this._lastMapData) this.renderMap(this._lastMapData);
+            }, 1000);
+        }
+    },
+
+    /* Banner uit en teller terug naar nul (ook bij een nieuwe trein) */
+    clearSignalLoss() {
+        const sl = this._signalLoss;
+        clearInterval(sl.timer);
+        sl.timer = null;
+        sl.missStreak = 0;
+        sl.active = false;
+        sl.since = null;
+    },
+
+    _formatElapsed(ms) {
+        const total = Math.max(0, Math.floor(ms / 1000));
+        const m = Math.floor(total / 60);
+        const sec = String(total % 60).padStart(2, '0');
+        return `${m}:${sec}`;
+    },
+
+    /* Tekent de banner bovenin het canvas (aangeroepen aan het eind van renderMap) */
+    _drawSignalLossBanner(ctx, cssWidth) {
+        const sl = this._signalLoss;
+        if (!sl.active) return;
+
+        const accent = getComputedStyle(document.body).getPropertyValue('--accent-color').trim() || '#ffcc00';
+        const font = 'Consolas, "Courier New", monospace';
+        const pad = 16;
+        const x = 16, y = 16;
+        const w = Math.max(160, cssWidth - 32);
+        const innerW = w - pad * 2;
+        const lineH = 18;
+
+        // Tekst laten teruglopen binnen de beschikbare breedte
+        ctx.save();
+        ctx.font = `13px ${font}`;
+        const wrap = (text) => {
+            const lines = [];
+            let line = '';
+            text.split(' ').forEach(word => {
+                const test = line ? `${line} ${word}` : word;
+                if (ctx.measureText(test).width > innerW && line) {
+                    lines.push(line);
+                    line = word;
+                } else {
+                    line = test;
+                }
+            });
+            if (line) lines.push(line);
+            return lines;
+        };
+        const body = [
+            ...wrap('No signal data received from API.'),
+            ...wrap('Signals, platforms and traffic may be inaccurate.')
+        ];
+
+        // Hoogte: titel + scheiding + tekstregels + scheiding + voettekst
+        const h = 38 + 10 + body.length * lineH + 10 + 28;
+
+        ctx.fillStyle = 'rgba(51, 51, 51, 0.94)';
+        ctx.strokeStyle = accent;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        if (ctx.roundRect) ctx.roundRect(x, y, w, h, 10); else ctx.rect(x, y, w, h);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.textBaseline = 'top';
+        ctx.textAlign = 'left';
+
+        // Titel
+        ctx.font = `bold 14px ${font}`;
+        ctx.fillStyle = accent;
+        ctx.fillText('WARNING - SIGNAL DATA LOST', x + pad, y + 14);
+
+        // Scheidingslijn onder de titel
+        ctx.strokeStyle = '#555';
+        ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(x + pad, y + 38); ctx.lineTo(x + w - pad, y + 38); ctx.stroke();
+
+        // Tekst
+        ctx.font = `13px ${font}`;
+        ctx.fillStyle = '#eeeeee';
+        body.forEach((line, i) => ctx.fillText(line, x + pad, y + 48 + i * lineH));
+
+        // Scheidingslijn + voettekst met verstreken tijd
+        const footY = y + 48 + body.length * lineH + 4;
+        ctx.strokeStyle = '#555';
+        ctx.beginPath(); ctx.moveTo(x + pad, footY); ctx.lineTo(x + w - pad, footY); ctx.stroke();
+
+        ctx.font = `12px ${font}`;
+        ctx.fillStyle = '#888888';
+        ctx.fillText('Waiting for data…', x + pad, footY + 8);
+        ctx.textAlign = 'right';
+        ctx.fillText(this._formatElapsed(Date.now() - sl.since), x + w - pad, footY + 8);
+        ctx.restore();
     },
 
     /* Updates elements in Top and Bottom bar */
@@ -336,9 +580,27 @@ renderMap(data) {
                 if (y < 0) return;
 
                 if (el.type === 'platform') {
-                    ctx.fillStyle = '#666'; ctx.fillRect(centerX + 8, y - 20, 10, 40);
-                    ctx.fillStyle = '#aaa'; ctx.font = '10px Arial';
-                    ctx.fillText(el.name, centerX + 22, y + 4);
+                    // Perron op schaal: van start_dist (staart) tot end_dist (kop, richting sein)
+                    const PLATFORM_WIDTH = 4;   // gelijk aan de lineWidth van de Main Track
+                    const PLATFORM_GAP = 6;     // ruimte tussen spoor en perron (vrij van de 12px treinblokjes)
+                    const startDist = el.start_dist ?? el.dist;
+                    const endDist = el.end_dist ?? (startDist + (el.length || 0));
+
+                    let yBottom = trainY - (startDist * pixelsPerMeter);
+                    let yTop = trainY - (endDist * pixelsPerMeter);
+                    if (yTop < 0) yTop = 0;
+                    if (yBottom > cssHeight) yBottom = cssHeight;
+                    if (yBottom <= yTop) return;
+
+                    // Zijde: L = links van het spoor, R = rechts
+                    const trackHalf = 2; // halve breedte van de Main Track (lineWidth 4)
+                    const x = el.side === 'L'
+                        ? centerX - trackHalf - PLATFORM_GAP - PLATFORM_WIDTH
+                        : centerX + trackHalf + PLATFORM_GAP;
+
+                    ctx.fillStyle = getComputedStyle(document.body)
+                        .getPropertyValue('--accent-color').trim() || '#ffcc00';
+                    ctx.fillRect(x, yTop, PLATFORM_WIDTH, yBottom - yTop);
                 }
                 else if (el.type === 'signal') {
                     // 1. De montagesteun
@@ -538,6 +800,9 @@ renderMap(data) {
         // Eigen trein positie indicator
         ctx.fillStyle = '#00aaff';
         ctx.fillRect(centerX - 6, trainY, 12, 20);
+
+        // Melding als de API geen volgend sein meestuurt (bovenop de kaart)
+        this._drawSignalLossBanner(ctx, cssWidth);
     },
 
     /**
@@ -647,44 +912,8 @@ renderMap(data) {
             return;
         }
 
-        // 1. Bereken de actuele statussen en vertragingen in de data array (JOUW EIGEN LOGICA)
-        let currentDelayMinutes = 0;
-        const nextEDRStop = timetableData.find(stop => stop.has_edr && !stop.isConfirmed);
-        if (nextEDRStop && nextEDRStop.delay_minutes) {
-           currentDelayMinutes = nextEDRStop.delay_minutes;
-        }
-
-        let currentHHMM;
-        if (state.serverTime) {
-            currentHHMM = state.serverTime;
-        } else if (state.hours && state.minutes) {
-            currentHHMM = `${String(state.hours).padStart(2, '0')}:${String(state.minutes).padStart(2, '0')}`;
-        } else {
-            const now = new Date();
-            currentHHMM = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-        }
-
-        let currentStopFound = false;
-
-        timetableData.forEach(stop => {
-            if (stop.has_edr) {
-               stop.is_passed = stop.isConfirmed;
-            } else {
-               stop.is_passed = stop.dep_actual < currentHHMM;
-            }
-        
-            if (!stop.is_passed && !currentStopFound) {
-                stop.is_current = true;
-               currentStopFound = true;
-            } else {
-                stop.is_current = false;
-            }
-        
-            if (!stop.is_passed && currentDelayMinutes > 0) {
-                stop.arr_actual = this._addMinutesToTime(stop.arr_planned, currentDelayMinutes);
-                stop.dep_actual = this._addMinutesToTime(stop.dep_planned, currentDelayMinutes);
-            }
-        });
+        // 1. Status (is_passed / is_current) en actuele tijden komen volledig uit de backend.
+        //    Gepasseerde stops zijn daar bevroren; hier niets herberekenen of overschrijven.
 
         const finalStop = timetableData[timetableData.length - 1];
         const reversedTimetableData = [...timetableData].reverse();
@@ -1074,7 +1303,7 @@ renderMap(data) {
 
             html += `
             <div class="consist-row">
-                <div class="col-idx">${String(index + 1).padStart(3, '0')}</div>
+                <div class="col-idx">${String(index + 1).padStart(2, '0')}</div>
                 <div class="col-type" title="${vehicle.variant}">${type}</div>
                 <div class="col-name">${name}</div>
                 <div class="col-status">${status}</div>
@@ -1235,5 +1464,47 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (btnZoomReset) {
         btnZoomReset.addEventListener('click', () => SimRailUI.setMapZoom('reset'));
+    }
+
+        // Fullscreen-knop: wisselt de browsertab tussen fullscreen en normaal
+    const btnFullscreen = document.getElementById('btn-tt-fullscreen');
+
+    // Controleer of de browser fullscreen ondersteunt (incl. webkit-prefix voor iPad Safari)
+    const fsSupported = document.fullscreenEnabled || document.webkitFullscreenEnabled;
+    const getFsElement = () => document.fullscreenElement || document.webkitFullscreenElement;
+
+    // Icoon en titel bijwerken op basis van de huidige fullscreen-status
+    const updateFullscreenIcon = () => {
+        if (!btnFullscreen) return;
+        const isFs = !!getFsElement();
+        // Nieuw <i>-element plaatsen, want lucide heeft het oude al vervangen door een <svg>
+        btnFullscreen.innerHTML = `<i data-lucide="${isFs ? 'minimize-2' : 'maximize-2'}"></i>`;
+        btnFullscreen.title = isFs ? 'Exit full screen' : 'Full screen';
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+    };
+
+    if (btnFullscreen) {
+        if (!fsSupported) {
+            btnFullscreen.style.display = 'none';
+            console.log('[UI] Fullscreen API not supported, button hidden');
+        } else {
+            btnFullscreen.addEventListener('click', async () => {
+                try {
+                    if (!getFsElement()) {
+                        const root = document.documentElement;
+                        if (root.requestFullscreen) await root.requestFullscreen();
+                        else if (root.webkitRequestFullscreen) root.webkitRequestFullscreen();
+                    } else {
+                        if (document.exitFullscreen) await document.exitFullscreen();
+                        else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+                    }
+                } catch (err) {
+                    console.warn('[UI] Fullscreen toggle failed:', err);
+                }
+            });
+
+            document.addEventListener('fullscreenchange', updateFullscreenIcon);
+            document.addEventListener('webkitfullscreenchange', updateFullscreenIcon);
+        }
     }
 });

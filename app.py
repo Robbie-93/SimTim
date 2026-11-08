@@ -13,6 +13,7 @@ from flask import Flask, jsonify, render_template, request, send_from_directory
 from threading import Thread, Lock
 from werkzeug.exceptions import HTTPException
 from log_setup import set_log_context
+from version import __version__
 
 # ------------------ SETTING ---------------------------
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
@@ -95,6 +96,59 @@ def get_cached_server_time_str():
         return f"{dt.strftime('%H:%M')}{stale_marker}"
     except Exception:
         return "unknown"
+
+def get_server_now(server_id):
+    """
+    Actuele servertijd als naive datetime (zelfde 'wandklok' als de timetable-strings).
+    Doortellen vanaf de laatste refresh. None als er geen tijd voor deze server bekend is.
+    """
+    with SERVER_TIME_LOCK:
+        epoch_ms = SERVER_TIME_CACHE.get("epoch_ms")
+        cached_server = SERVER_TIME_CACHE.get("server_id")
+        ts = SERVER_TIME_CACHE.get("ts", 0)
+
+    if epoch_ms is None or cached_server != server_id:
+        return None
+    try:
+        base = datetime.fromtimestamp(epoch_ms / 1000, tz=timezone.utc).replace(tzinfo=None)
+        return base + timedelta(seconds=time.time() - ts)
+    except Exception:
+        return None
+
+
+# ------------------- BEVROREN ACTUELE TIJDEN -------------------
+# Zodra een stop gepasseerd is, liggen de actuele aankomst/vertrek vast en worden
+# ze bij latere polls niet meer herberekend. Alleen de huidige rit wordt bewaard:
+# bij een andere rit begint het geheugen leeg en vult het zich opnieuw uit de API.
+FROZEN_TIMES = {"trip_key": None, "stops": {}}
+FROZEN_TIMES_LOCK = Lock()
+
+
+def _get_frozen_trip(trip_key):
+    with FROZEN_TIMES_LOCK:
+        if FROZEN_TIMES["trip_key"] != trip_key:
+            if FROZEN_TIMES["trip_key"] is not None:
+                request_logger.info(
+                    f"[{datetime.now().strftime('%H:%M:%S')}] Frozen times reset: "
+                    f"{FROZEN_TIMES['trip_key']} -> {trip_key}"
+                )
+            FROZEN_TIMES["trip_key"] = trip_key
+            FROZEN_TIMES["stops"] = {}
+        return FROZEN_TIMES["stops"]
+
+def _edr_is_passed(edr_point):
+    """
+    Is dit EDR-punt echt gepasseerd? 'isConfirmed' is leidend: EDR vult
+    actualArrival/DepartureTime ook vooraf in als prognose, dus die zeggen niets.
+    Alleen als isConfirmed ontbreekt valt dit terug op een echte vertrektijd.
+    """
+    if not edr_point:
+        return False
+    confirmed = edr_point.get('isConfirmed')
+    if confirmed is not None:
+        return bool(confirmed)
+    return bool(edr_point.get('actualDepartureTime'))
+
 
 TIMETABLE_TTL_CACHE = {}
 TIMETABLE_TTL_SECONDS = 60
@@ -501,6 +555,303 @@ def build_radar_path(start_signal_name, dist_to_start_signal, live_signal_speed,
             radar_logger.error(f"Error building radar path from signal '{start_signal_name}': {e}")
 
     return map_elements
+
+# ==========================================================================
+# PERRONS (platforms.db) - koppeling via het eerstvolgende sein
+# ==========================================================================
+platform_logger = logging.getLogger("app.platforms")
+
+PLATFORMS_DB_PATH = os.path.join(DATA_DIR, "platforms.db")
+# signal_name -> lijst van perron-records (per richting 'up' / 'down')
+_PLATFORM_INDEX = {"by_signal": {}, "mtime": None}
+_PLATFORM_INDEX_LOCK = Lock()
+
+_ROMAN_MAP = {"I": 1, "V": 5, "X": 10, "L": 50}
+
+# Eén INFO-melding per onvolledig/dubbelzinnig perron, niet elke 2s-poll
+_PLATFORM_INCOMPLETE_LOGGED = set()
+
+
+def _normalize_station_name(name):
+    """Naam vergelijkbaar maken: kleine letters, zonder diakrieten (ł expliciet!)."""
+    import unicodedata
+    if not name:
+        return ""
+    s = str(name).strip().lower().replace("ł", "l")
+    s = unicodedata.normalize("NFKD", s)
+    s = "".join(ch for ch in s if not unicodedata.combining(ch))
+    return " ".join(s.replace("-", " ").split())
+
+
+def _normalize_platform_number(value):
+    """Perron/spoor naar een vergelijkbare string ('IV' -> '4', 2 -> '2'). Onbekend -> None."""
+    if value is None:
+        return None
+    s = str(value).strip().upper()
+    if not s or s in ("-", "NONE", "NULL"):
+        return None
+    if s.isdigit():
+        return str(int(s))
+    # Romeinse cijfers (SimRail timetable gebruikt die voor perrons)
+    if all(ch in _ROMAN_MAP for ch in s):
+        total, prev = 0, 0
+        for ch in reversed(s):
+            val = _ROMAN_MAP[ch]
+            total = total - val if val < prev else total + val
+            prev = max(prev, val)
+        return str(total)
+    return s
+
+
+def _load_platform_index():
+    """Laadt platforms.db in het geheugen; herlaadt alleen als het bestand gewijzigd is."""
+    try:
+        mtime = os.path.getmtime(PLATFORMS_DB_PATH)
+    except OSError:
+        # Eén keer melden, niet bij elke poll
+        if not _PLATFORM_INDEX.get("missing_logged"):
+            platform_logger.warning(f"platforms.db not found at {PLATFORMS_DB_PATH} - platforms disabled")
+            _PLATFORM_INDEX.update({"by_signal": {}, "mtime": None, "missing_logged": True})
+        return _PLATFORM_INDEX["by_signal"]
+
+    with _PLATFORM_INDEX_LOCK:
+        if _PLATFORM_INDEX["mtime"] == mtime:
+            return _PLATFORM_INDEX["by_signal"]
+
+        by_signal = {}
+        usable = 0
+        try:
+            # Alleen-lezen openen: de recorder mag ondertussen schrijven
+            uri = "file:" + PLATFORMS_DB_PATH.replace("\\", "/") + "?mode=ro"
+            conn = sqlite3.connect(uri, uri=True, check_same_thread=False)
+            conn.row_factory = sqlite3.Row
+            rows = conn.execute("""
+                SELECT id, station, perron, spoor, lengte,
+                       up_next_signal, up_afstand, up_perronzijde,
+                       down_next_signal, down_afstand, down_perronzijde
+                FROM platforms
+            """).fetchall()
+            conn.close()
+        except Exception as e:
+            platform_logger.error(f"Failed to read platforms.db: {e}")
+            return _PLATFORM_INDEX["by_signal"]
+
+        for r in rows:
+            # Per richting een eigen record; sein + afstand + zijde komen uit dezelfde categorie
+            for direction in ("up", "down"):
+                sig = r[f"{direction}_next_signal"]
+                if not sig:
+                    continue
+                rec = {
+                    "id": r["id"],
+                    "station": r["station"],
+                    "station_key": _normalize_station_name(r["station"]),
+                    "perron": _normalize_platform_number(r["perron"]),
+                    "spoor": _normalize_platform_number(r["spoor"]),
+                    "perron_raw": r["perron"],
+                    "spoor_raw": r["spoor"],
+                    "lengte": r["lengte"],
+                    "direction": direction,
+                    "afstand": r[f"{direction}_afstand"],
+                    "zijde": (r[f"{direction}_perronzijde"] or "").strip().upper() or None,
+                }
+                # Hoofdletter-ongevoelig: in de database staat bv. zowel '3877_Sk_P1' als '3877_SK_P1'
+                by_signal.setdefault(sig.strip().upper(), []).append(rec)
+                if rec["afstand"] is not None and rec["lengte"] and rec["zijde"] in ("L", "R"):
+                    usable += 1
+
+        _PLATFORM_INDEX.update({"by_signal": by_signal, "mtime": mtime, "missing_logged": False})
+        platform_logger.info(
+            f"[{datetime.now().strftime('%H:%M:%S')}] Platform index (re)loaded: "
+            f"{len(rows)} platforms, {len(by_signal)} signals, {usable} drawable direction records"
+        )
+        return by_signal
+
+
+def build_platform_elements(map_elements, final_timetable):
+    """
+    Bouwt 'platform'-elementen voor de radar.
+    - Alleen voor stations die in de timetable als PH staan.
+    - Gekoppeld via het sein in onze sliert (up_next_signal of down_next_signal),
+      afstand en perronzijde uit dezelfde categorie.
+    - Perron ligt vóór het sein: kop = sein.dist - afstand, staart = kop - lengte.
+    """
+    by_signal = _load_platform_index()
+    if not by_signal:
+        return []
+
+    # PH-stops uit de timetable, met spoor/perron voor disambiguatie
+    ph_stops = {}
+    for stop in final_timetable:
+        if stop.get("stop_type") != "PH":
+            continue
+        ph_stops[_normalize_station_name(stop.get("name"))] = {
+            "track": _normalize_platform_number(stop.get("track")),
+            "platform": _normalize_platform_number(stop.get("platform")),
+        }
+    if not ph_stops:
+        return []
+
+    platforms = []
+    placed_ids = set()
+
+    for sig in map_elements:
+        if sig.get("type") != "signal":
+            continue
+        candidates = [
+            c for c in by_signal.get(str(sig["name"]).strip().upper(), [])
+            if c["station_key"] in ph_stops
+        ]
+        if not candidates:
+            continue
+
+        # Disambiguatie: eerst op spoor, dan op perronnummer uit de timetable
+        tt = ph_stops[candidates[0]["station_key"]]
+        if len(candidates) > 1 and tt["track"]:
+            by_track = [c for c in candidates if c["spoor"] == tt["track"]]
+            if by_track:
+                candidates = by_track
+        if len(candidates) > 1 and tt["platform"]:
+            by_perron = [c for c in candidates if c["perron"] == tt["platform"]]
+            if by_perron:
+                candidates = by_perron
+        if len(candidates) > 1:
+            log_key = ("ambiguous", sig["name"], tt["track"], tt["platform"])
+            if log_key not in _PLATFORM_INCOMPLETE_LOGGED:
+                _PLATFORM_INCOMPLETE_LOGGED.add(log_key)
+                platform_logger.info(
+                    f"[{datetime.now().strftime('%H:%M:%S')}] Platform via {sig['name']} not drawn - ambiguous: "
+                    f"{[c['id'] for c in candidates]} (timetable track={tt['track']}, platform={tt['platform']})"
+                )
+            continue
+
+        rec = candidates[0]
+        if rec["afstand"] is None or not rec["lengte"] or rec["zijde"] not in ("L", "R"):
+            log_key = (rec["id"], rec["direction"], sig["name"])
+            if log_key not in _PLATFORM_INCOMPLETE_LOGGED:
+                _PLATFORM_INCOMPLETE_LOGGED.add(log_key)
+                platform_logger.info(
+                    f"[{datetime.now().strftime('%H:%M:%S')}] Platform {rec['id']} ({rec['direction']}) via "
+                    f"{sig['name']} not drawn - incomplete data "
+                    f"(afstand={rec['afstand']}, lengte={rec['lengte']}, zijde={rec['zijde']})"
+                )
+            continue
+        place_key = (rec["id"], rec["direction"])
+        if place_key in placed_ids:
+            continue
+        placed_ids.add(place_key)
+
+        head_dist = int(sig["dist"] - rec["afstand"])
+        tail_dist = int(head_dist - rec["lengte"])
+        platforms.append({
+            "type": "platform",
+            "name": rec["station"],
+            "dist": tail_dist,          # sorteersleutel: begin van het perron
+            "start_dist": tail_dist,
+            "end_dist": head_dist,
+            "length": rec["lengte"],
+            "side": rec["zijde"],
+            "perron": rec["perron"],
+            "spoor": rec["spoor"],
+            "signal": sig["name"],
+            "direction": rec["direction"],
+        })
+
+    return platforms
+
+def _to_roman(value):
+    """Perronnummer tonen zoals in de SimRail-dienstregeling ('2' -> 'II'). Niet-numeriek blijft ongewijzigd."""
+    s = str(value).strip() if value is not None else ""
+    if not s.isdigit() or int(s) <= 0:
+        return s or None
+    n = int(s)
+    out = ""
+    for val, sym in ((50, "L"), (40, "XL"), (10, "X"), (9, "IX"), (5, "V"), (4, "IV"), (1, "I")):
+        while n >= val:
+            out += sym
+            n -= val
+    return out
+
+
+# Laatst gemelde perronwijziging per trein, zodat het log niet elke 2s-poll volloopt
+_LAST_PLATFORM_NOTICE = {}
+
+
+def detect_platform_notice(train_num, live_signal_name, final_timetable):
+    """
+    Vergelijkt het perron achter het live 'SignalInFront' (platforms.db) met
+    spoor/perron uit de dienstregeling voor dezelfde (nog niet gepasseerde) PH-stop.
+    Retourneert een notice-dict bij een afwijking, anders None.
+    - Komt één van de kandidaten overeen met de dienstregeling: geen melding.
+    - Wijzen meerdere kandidaten naar verschillende sporen: niet te bepalen, geen melding.
+    """
+    if not live_signal_name:
+        return None
+
+    by_signal = _load_platform_index()
+    candidates_all = by_signal.get(live_signal_name.strip().upper(), [])
+    if not candidates_all:
+        return None
+
+    # Nog niet gepasseerde PH-stops uit de dienstregeling
+    ph_stops = {}
+    for stop in final_timetable:
+        if stop.get("stop_type") != "PH" or stop.get("is_passed"):
+            continue
+        key = _normalize_station_name(stop.get("name"))
+        ph_stops.setdefault(key, stop)  # eerste (eerstvolgende) voorkomen telt
+
+    candidates = [c for c in candidates_all if c["station_key"] in ph_stops]
+    if not candidates:
+        return None
+
+    tt_stop = ph_stops[candidates[0]["station_key"]]
+    tt_track = _normalize_platform_number(tt_stop.get("track"))
+    tt_platform = _normalize_platform_number(tt_stop.get("platform"))
+
+    # Niets om mee te vergelijken in de dienstregeling
+    if not tt_track and not tt_platform:
+        return None
+
+    def matches_timetable(c):
+        track_ok = not tt_track or not c["spoor"] or c["spoor"] == tt_track
+        platform_ok = not tt_platform or not c["perron"] or c["perron"] == tt_platform
+        return track_ok and platform_ok
+
+    if any(matches_timetable(c) for c in candidates):
+        _LAST_PLATFORM_NOTICE.pop(str(train_num), None)
+        return None
+
+    distinct = {(c["spoor"], c["perron"]) for c in candidates}
+    if len(distinct) > 1:
+        platform_logger.debug(
+            f"[{datetime.now().strftime('%H:%M:%S')}] Platform change undetermined for train {train_num} "
+            f"at signal {live_signal_name}: {[c['id'] for c in candidates]}"
+        )
+        return None
+
+    rec = candidates[0]
+    notice = {
+        "key": f"{rec['station_key']}|{rec['spoor']}|{rec['perron']}",
+        "station": rec["station"],
+        "track": rec["spoor_raw"],
+        "platform": _to_roman(rec["perron_raw"]),
+        "side": rec["zijde"] if rec["zijde"] in ("L", "R") else None,
+        "tt_track": tt_stop.get("track") if tt_track else None,
+        "tt_platform": tt_stop.get("platform") if tt_platform else None,
+        "signal": live_signal_name,
+    }
+
+    if _LAST_PLATFORM_NOTICE.get(str(train_num)) != notice["key"]:
+        _LAST_PLATFORM_NOTICE[str(train_num)] = notice["key"]
+        platform_logger.info(
+            f"[{datetime.now().strftime('%H:%M:%S')}] Platform change for train {train_num} at {rec['station']}: "
+            f"timetable track {notice['tt_track'] or '-'} / platform {notice['tt_platform'] or '-'} -> "
+            f"detected track {notice['track'] or '-'} / platform {notice['platform'] or '-'} "
+            f"(signal {live_signal_name}, side {notice['side'] or 'unknown'})"
+        )
+    return notice
+
 # -------------------- ROUTES --------------------
 
 @app.errorhandler(Exception)
@@ -514,7 +865,7 @@ def handle_uncaught_exception(e):
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return render_template('index.html', version=__version__)
 
 @app.route('/favicon.ico')
 def favicon():
@@ -526,13 +877,15 @@ def status_ping():
 
 @app.route('/api/health')
 def health_check():
-    server_id = request.args.get('server_id', 'int1')
+    server_id = request.args.get('server_id', '')
     train_id = request.args.get('train_id', '')
 
+    # Zonder gekozen server/trein worden die checks niet uitgevoerd maar als 'standby' gemeld
     endpoints = {
         "Servers": "https://panel.simrail.eu:8084/servers-open",
-        "Server Time": f"https://api1.aws.simrail.eu:8082/api/getTime?serverCode={server_id}",
     }
+    if server_id:
+        endpoints["Server Time"] = f"https://api1.aws.simrail.eu:8082/api/getTime?serverCode={server_id}"
 
     results = {}
     overall_status = "online"
@@ -549,23 +902,29 @@ def health_check():
             results[name] = "offline"
             overall_status = "offline"
 
-    tt_cache_key = (server_id, str(train_id))
-    cached_tt_entry = TIMETABLE_TTL_CACHE.get(tt_cache_key)
-    if cached_tt_entry and (time.time() - cached_tt_entry["ts"] < TIMETABLE_TTL_SECONDS):
-        results["Train Timetable"] = "online"
+    if not server_id:
+        results["Server Time"] = "standby"
+
+    if not server_id or not train_id:
+        results["Train Timetable"] = "standby"
     else:
-        try:
-            tt_url = f"https://api1.aws.simrail.eu:8082/api/getAllTimetables?serverCode={server_id}&train={train_id}"
-            response = HTTP.get(tt_url, timeout=2)
-            if response.status_code == 200:
-                results["Train Timetable"] = "online"
-                TIMETABLE_TTL_CACHE[tt_cache_key] = {"data": response.json(), "ts": time.time()}
-            else:
-                results["Train Timetable"] = "error"
-                overall_status = "partial"
-        except Exception:
-            results["Train Timetable"] = "offline"
-            overall_status = "offline"
+        tt_cache_key = (server_id, str(train_id))
+        cached_tt_entry = TIMETABLE_TTL_CACHE.get(tt_cache_key)
+        if cached_tt_entry and (time.time() - cached_tt_entry["ts"] < TIMETABLE_TTL_SECONDS):
+            results["Train Timetable"] = "online"
+        else:
+            try:
+                tt_url = f"https://api1.aws.simrail.eu:8082/api/getAllTimetables?serverCode={server_id}&train={train_id}"
+                response = HTTP.get(tt_url, timeout=2)
+                if response.status_code == 200:
+                    results["Train Timetable"] = "online"
+                    TIMETABLE_TTL_CACHE[tt_cache_key] = {"data": response.json(), "ts": time.time()}
+                else:
+                    results["Train Timetable"] = "error"
+                    overall_status = "partial"
+            except Exception:
+                results["Train Timetable"] = "offline"
+                overall_status = "offline"
 
     cache_checks = {
         "Trains": ("trains", 8),
@@ -652,6 +1011,9 @@ def get_train_data():
         # Komt uit de achtergrond-cache (~1.5s vers) i.p.v. elke poll opnieuw op te halen.
         live_url = f"https://panel.simrail.eu:8084/trains-open?serverCode={server_id}"
         live_res = get_cached_or_fetch("trains", live_url, server_id, verify_ssl=False, max_age=3) or {}
+        # Geen live data én geen cache: dit is een verbindingsprobleem, geen onbekende trein
+        if not live_res:
+            return jsonify({"error": "SimRail live train data unavailable"}), 502
         all_trains = live_res.get('data', [])
         my_live = next((t for t in all_trains if str(t.get('TrainNoLocal')) == str(train_num)), None)
 
@@ -773,6 +1135,23 @@ def get_train_data():
                         continue
         
         radio_db = get_radio_db()
+
+        # Servertijd (niet de pc-klok) voor de passeer-check van tussenhaltes
+        server_now = get_server_now(server_id)
+
+        # Laatste EDR-stop die bevestigd (isConfirmed) is: alles daarvóór is zeker gepasseerd.
+        # Niet op actualArrival/DepartureTime: die bevatten ook prognoses voor stops die nog komen.
+        last_edr_reached_idx = -1
+        for idx, pt in enumerate(raw_timetable):
+            em = edr_dict.get(pt.get('nameForPerson', ''))
+            if em and _edr_is_passed(em):
+                last_edr_reached_idx = idx
+
+        # Bevroren tijden van deze rit (eerste geplande tijd onderscheidt ritten met hetzelfde nummer)
+        first_pt = raw_timetable[0] if raw_timetable else {}
+        trip_key = (server_id, str(train_num), first_pt.get('departureTime') or first_pt.get('arrivalTime'))
+        frozen_trip = _get_frozen_trip(trip_key)
+        newly_frozen = []
         
         for idx, pt in enumerate(raw_timetable):
             name = pt.get('nameForPerson', '')
@@ -819,9 +1198,10 @@ def get_train_data():
                 act_arr_str = datetime.strptime(edr_arr, "%Y-%m-%d %H:%M:%S").strftime("%H:%M") if edr_arr else format_api_time(arr_str)
                 if edr_dep:
                     act_dep_str = datetime.strptime(edr_dep, "%Y-%m-%d %H:%M:%S").strftime("%H:%M")
-                    is_passed = True
                 else:
                     act_dep_str = format_api_time(dep_str)
+                # Gepasseerd alleen als EDR de stop bevestigd heeft (vertrektijd kan een prognose zijn)
+                is_passed = _edr_is_passed(edr_match)
             else:
                 if arr_str:
                     planned_arr = datetime.strptime(arr_str, "%Y-%m-%d %H:%M:%S")
@@ -833,14 +1213,29 @@ def get_train_data():
                     actual_dep = planned_dep + timedelta(minutes=upcoming_edr_delay)
                     act_dep_str = actual_dep.strftime("%H:%M")
                     
-                try:
-                    now_time = datetime.now().strftime("%H:%M")
-                    dep_compare = act_dep_str if act_dep_str != "--:--" else format_api_time(dep_str)
-                    is_passed = dep_compare < now_time
-                except:
-                    is_passed = False
+                # Gepasseerd als een latere EDR-stop al bereikt is, of als de
+                # geprojecteerde vertrektijd vóór de servertijd ligt (volledige datum: middernacht-veilig)
+                if idx < last_edr_reached_idx:
+                    is_passed = True
+                elif server_now is not None:
+                    compare_dt = actual_dep if dep_str else (actual_arr if arr_str else None)
+                    is_passed = compare_dt is not None and compare_dt < server_now
 
-            is_current = (idx == current_station_index)
+            # Bevriezen: eenmaal gepasseerd blijven tijden en status vast
+            frozen_key = f"{idx}|{name}"
+            frozen = frozen_trip.get(frozen_key)
+            if frozen:
+                is_passed = True
+                # Echte EDR-tijden blijven leidend; anders de bevroren waarden
+                edr_has_actuals = is_edr and _edr_is_passed(edr_match) and edr_match.get('actualDepartureTime')
+                if not edr_has_actuals:
+                    act_arr_str = frozen["arr"]
+                    act_dep_str = frozen["dep"]
+            elif is_passed:
+                frozen_trip[frozen_key] = {"arr": act_arr_str, "dep": act_dep_str}
+                newly_frozen.append(f"{name} ({act_arr_str}/{act_dep_str})")
+
+            is_current = False  # wordt na de lus bepaald: eerste niet-gepasseerde stop
             current_station_delay = int(edr_match.get('delay', 0)) if is_edr else upcoming_edr_delay
 
             delayClass = "delay-ontime" 
@@ -877,6 +1272,20 @@ def get_train_data():
                 "delay_minutes": current_station_delay, 
                 "delayClass": delayClass,
             })
+
+        # Huidige stop = eerste niet-gepasseerde stop (ook tussenhaltes)
+        for stop in final_timetable:
+            if not stop["is_passed"]:
+                stop["is_current"] = True
+                break
+
+        if newly_frozen:
+            request_logger.info(
+                f"[{datetime.now().strftime('%H:%M:%S')}] Train {train_num}: actual times frozen for "
+                f"{len(newly_frozen)} passed stop(s): {', '.join(newly_frozen)}"
+            )
+        if server_now is None:
+            request_logger.debug(f"Server time for {server_id} not yet cached - time-based passing check skipped")
 
         # 6. Voertuigverrijking (Summary / Technical / Consist)
         train_extra = train_db.get(str(train_num), {})
@@ -1001,6 +1410,13 @@ def get_train_data():
         raw_signal_speed = td.get('SignalInFrontSpeed', 0)
         live_signal_speed = "Vmax" if raw_signal_speed == 32767 else raw_signal_speed
 
+        # Perronwijziging t.o.v. dienstregeling (via het live sein vóór de trein)
+        platform_notice = None
+        try:
+            platform_notice = detect_platform_notice(train_num, live_signal_name, final_timetable)
+        except Exception as e:
+            platform_logger.error(f"Error detecting platform change: {e}\n{traceback.format_exc()}")
+
         berekende_seinen = []
         if live_signal_name:
             radar_logger.debug(f"Live signal: {live_signal_name} at {live_signal_dist}m. Calculating chain...")
@@ -1060,6 +1476,19 @@ def get_train_data():
                         "destination": t.get('EndStation', '')
                     })
 
+            # --- PERRONS (alleen PH-stops, gekoppeld via sein in de sliert) ---
+            # Na de verkeers-loop toegevoegd zodat de seinnaam-match daar niet geraakt wordt.
+            try:
+                platform_elements = build_platform_elements(berekende_seinen, final_timetable)
+                if platform_elements:
+                    radar_logger.debug(
+                        f"Platforms on radar: "
+                        f"{[(p['name'], p['signal'], p['direction'], p['side']) for p in platform_elements]}"
+                    )
+                berekende_seinen.extend(platform_elements)
+            except Exception as e:
+                platform_logger.error(f"Error building platform elements: {e}\n{traceback.format_exc()}")
+
             # Sorteer de sliert opnieuw zodat seinen en treinen op volgorde van afstand staan
             berekende_seinen.sort(key=lambda x: x['dist'])
 
@@ -1081,7 +1510,8 @@ def get_train_data():
                 "dist": live_signal_dist,
                 "speed": live_signal_speed
             } if live_signal_name else None,
-            "map_elements": berekende_seinen
+            "map_elements": berekende_seinen,
+            "platform_notice": platform_notice
         })
 
     except Exception as e:

@@ -2,7 +2,7 @@
 <div id="cmd-overlay">
     <div class="cmd-container">
         <div id="cmd-header">
-            <span>SimTim - Simrail Driver Assistant - v1.0</span>
+            <span>SimTim - Simrail Driver Assistant - v{{ version }}</span>
             <span class="cmd-close-x" onclick="closeCMD()">X</span>
         </div>
         <div id="cmd-log">
@@ -20,6 +20,25 @@
         <hr style="border: 0; border-top: 1px solid #444; margin: 10px 0;">
         <div id="status-details" style="font-family: 'Courier New', monospace; font-size: 14px; line-height: 1.6;"></div>
         <button onclick="closeStatusModal()" style="margin-top: 20px; width: 100%; padding: 10px; background: #333; color: white; border: 1px solid #555; cursor: pointer; font-family: monospace;">CLOSE</button>
+    </div>
+</div>
+
+<!-- ============ DISPATCH NOTICE (PERRONWIJZIGING) ============ -->
+<div id="platform-notice">
+    <div class="pn-header">
+        <i data-lucide="triangle-alert" class="pn-icon"></i>
+        <span>DISPATCH NOTICE · PLATFORM CHANGE</span>
+    </div>
+    <div class="pn-intro">Train <span id="pn-train"></span> will call at:</div>
+    <div class="pn-grid">
+        <span class="pn-key">Station</span>  <span id="pn-station" class="pn-val pn-strong"></span>
+        <span class="pn-key" id="pn-track-key">Track</span>    <span id="pn-track" class="pn-val"></span>
+        <span class="pn-key" id="pn-platform-key">Platform</span> <span id="pn-platform" class="pn-val"></span>
+        <span class="pn-key" id="pn-side-key">Doors</span>    <span id="pn-side" class="pn-val"></span>
+    </div>
+    <div class="pn-footer">
+        <span id="pn-countdown" class="pn-muted"></span>
+        <button onclick="SimRailUI.closePlatformNotice()">ACKNOWLEDGE</button>
     </div>
 </div>
 

@@ -1,11 +1,15 @@
 import tkinter as tk
 from tkinter import ttk, scrolledtext, filedialog, messagebox
 import threading
+import logging
 import os
 import shutil
 import socket
+import subprocess
 import sys
 import webbrowser
+
+import requests
 
 from update_checker import check_for_update
 from version import __version__
@@ -21,6 +25,8 @@ else:
 LOGO_PATH = os.path.join(RESOURCE_DIR, "assets", "logo.png")
 
 ICON_PATH = os.path.join(RESOURCE_DIR, "icon.ico")
+
+logger = logging.getLogger("gui")
 
 
 def _detect_lan_ip():
@@ -404,6 +410,7 @@ class ControlPanel(tk.Tk):
             self.update_label.config(text=f"New version available: {result['latest']} (v{__version__} installed)")
             self._latest_url = result["url"]
             self.download_btn.config(state="normal")
+            self._show_update_popup(result)
         else:
             self.update_label.config(text=f"You're running the latest version (v{__version__}).")
             self.download_btn.config(state="disabled")
@@ -412,5 +419,293 @@ class ControlPanel(tk.Tk):
         if self._latest_url:
             webbrowser.open(self._latest_url)
 
+    def _show_update_popup(self, result):
+        """Toont de update-popup, maar nooit twee tegelijk (bv. na 'Check now')."""
+        popup = getattr(self, "_update_popup", None)
+        if popup is not None and popup.winfo_exists():
+            popup.lift()
+            return
+        logger.info(f"Update available: {result['latest']} (installed v{__version__})")
+        self._update_popup = UpdatePopup(self, result)
+
     def _on_close(self):
         self.destroy()
+
+
+# ---------------------------------------------------------------------------
+# Update-popup
+# ---------------------------------------------------------------------------
+def _downloads_dir():
+    """Standaard Downloads-map van de gebruiker; valt terug op de map van de exe."""
+    candidate = os.path.join(os.path.expanduser("~"), "Downloads")
+    return candidate if os.path.isdir(candidate) else BASE_DIR
+
+
+def _pick_release_asset(assets):
+    """Kiest het bestand om te downloaden: bij voorkeur de .zip (map met
+    SimTim.exe + data), anders een losse .exe. None als er niets bruikbaars is."""
+    for ext in (".zip", ".exe"):
+        for asset in assets or []:
+            if asset["name"].lower().endswith(ext):
+                return asset
+    return None
+
+
+def _format_size(num_bytes):
+    return f"{num_bytes / (1024 * 1024):.1f} MB"
+
+
+class UpdatePopup(tk.Toplevel):
+    """Modale popup die meldt dat er een nieuwe versie is, met 'Update'
+    (download direct de nieuwste release van GitHub) en 'Not now' (sluiten).
+    Gebruikt hetzelfde kleurenpalet en dezelfde ttk-stijlen als ControlPanel."""
+
+    WIDTH = 440
+
+    def __init__(self, parent, result):
+        super().__init__(parent)
+        self.parent = parent
+        self.result = result
+        self.asset = _pick_release_asset(result.get("assets"))
+        self._cancel = threading.Event()
+        self._downloading = False
+        self._downloaded_path = None
+
+        self.title("Update available")
+        self.configure(bg=COLOR_BG)
+        self.resizable(False, False)
+        self.transient(parent)
+        if os.path.exists(ICON_PATH):
+            try:
+                self.iconbitmap(ICON_PATH)
+            except tk.TclError:
+                pass
+
+        self._setup_style()
+        self._build()
+        self._center_on_parent()
+
+        self.protocol("WM_DELETE_WINDOW", self._handle_not_now)
+        self.bind("<Escape>", lambda e: self._handle_not_now())
+        self.bind("<Return>", lambda e: self._handle_update())
+        self.grab_set()
+
+    # ---------- Opbouw ----------
+    def _setup_style(self):
+        style = ttk.Style(self)
+        style.configure(
+            "Update.Horizontal.TProgressbar",
+            troughcolor=COLOR_CARD_BORDER, background=COLOR_ACCENT,
+            bordercolor=COLOR_CARD, lightcolor=COLOR_ACCENT, darkcolor=COLOR_ACCENT,
+            borderwidth=0, thickness=6,
+        )
+        style.configure("Version.Card.TLabel", background=COLOR_CARD, foreground=COLOR_TEXT, font=("Consolas", 11, "bold"))
+        style.configure("NewVersion.Card.TLabel", background=COLOR_CARD, foreground=COLOR_SUCCESS, font=("Consolas", 11, "bold"))
+
+    def _build(self):
+        # Kaart met dezelfde 1px-rand als in het hoofdvenster
+        outer = tk.Frame(self, bg=COLOR_CARD_BORDER)
+        outer.pack(fill="both", expand=True, padx=16, pady=(16, 12))
+        card = ttk.Frame(outer, style="Card.TFrame")
+        card.pack(fill="both", expand=True, padx=1, pady=1)
+
+        # Kop: logo + titel
+        header = ttk.Frame(card, style="Card.TFrame")
+        header.pack(fill="x", padx=16, pady=(16, 10))
+
+        logo = tk.Canvas(header, width=48, height=48, bg=COLOR_CARD, highlightthickness=0)
+        logo.pack(side="left", padx=(0, 12))
+        self._draw_logo(logo)
+
+        title_frame = ttk.Frame(header, style="Card.TFrame")
+        title_frame.pack(side="left", fill="y")
+        ttk.Label(
+            title_frame, text="Update available", style="Card.TLabel", font=FONT_HEADING
+        ).pack(anchor="w")
+        ttk.Label(
+            title_frame, text="A new version of SimTim Terminal is ready",
+            style="Muted.Card.TLabel",
+        ).pack(anchor="w")
+
+        # Versie-vergelijking: geïnstalleerd -> nieuw
+        versions = ttk.Frame(card, style="Card.TFrame")
+        versions.pack(fill="x", padx=16, pady=(4, 10))
+        for col, (caption, value, style) in enumerate((
+            ("INSTALLED", f"v{__version__}", "Version.Card.TLabel"),
+            (None, "→", "Muted.Card.TLabel"),
+            ("LATEST", self.result["latest"], "NewVersion.Card.TLabel"),
+        )):
+            cell = ttk.Frame(versions, style="Card.TFrame")
+            cell.grid(row=0, column=col, sticky="w", padx=(0, 18))
+            ttk.Label(cell, text=caption or " ", style="Muted.Card.TLabel").pack(anchor="w")
+            ttk.Label(cell, text=value, style=style).pack(anchor="w")
+
+        if self.asset:
+            body = (
+                f"Click Update to download {self.asset['name']} "
+                f"({_format_size(self.asset['size'])}) directly from GitHub "
+                f"to your Downloads folder."
+            )
+        else:
+            body = "Click Update to open the release page on GitHub."
+        self.body_label = ttk.Label(
+            card, text=body, style="Muted.Card.TLabel", wraplength=self.WIDTH - 90, justify="left"
+        )
+        self.body_label.pack(anchor="w", padx=16, pady=(0, 14))
+
+        # Voortgangsbalk (pas zichtbaar tijdens het downloaden)
+        self.progress_frame = ttk.Frame(card, style="Card.TFrame")
+        self.progress = ttk.Progressbar(
+            self.progress_frame, style="Update.Horizontal.TProgressbar",
+            mode="determinate", maximum=100,
+        )
+        self.progress.pack(fill="x")
+        self.progress_label = ttk.Label(self.progress_frame, text="", style="Muted.Card.TLabel")
+        self.progress_label.pack(anchor="w", pady=(6, 0))
+
+        # Knoppen
+        buttons = ttk.Frame(self, style="TFrame")
+        buttons.pack(fill="x", padx=16, pady=(0, 16))
+
+        self.update_btn = ttk.Button(buttons, text="Update", command=self._handle_update)
+        self.update_btn.pack(side="right")
+
+        self.not_now_btn = ttk.Button(
+            buttons, text="Not now", style="Secondary.TButton", command=self._handle_not_now
+        )
+        self.not_now_btn.pack(side="right", padx=(0, 8))
+
+    def _draw_logo(self, canvas):
+        """Zelfde logo als in de kop van het hoofdvenster, met monogram-fallback."""
+        if os.path.exists(LOGO_PATH):
+            try:
+                self._logo_image = tk.PhotoImage(file=LOGO_PATH)
+                canvas.create_image(24, 24, image=self._logo_image)
+                return
+            except tk.TclError:
+                pass
+        canvas.create_oval(2, 2, 46, 46, fill=COLOR_ACCENT, outline="")
+        canvas.create_text(24, 24, text="ST", fill="#ffffff", font=("Segoe UI Semibold", 15))
+
+    def _center_on_parent(self):
+        self.update_idletasks()
+        w = self.WIDTH
+        h = self.winfo_reqheight()
+        x = self.parent.winfo_rootx() + (self.parent.winfo_width() - w) // 2
+        y = self.parent.winfo_rooty() + (self.parent.winfo_height() - h) // 3
+        self.geometry(f"{w}x{h}+{max(x, 0)}+{max(y, 0)}")
+
+    def _refit_height(self):
+        """Past de vensterhoogte aan nadat de voortgangsbalk is getoond/verborgen."""
+        self.update_idletasks()
+        self.geometry(f"{self.WIDTH}x{self.winfo_reqheight()}")
+
+    # ---------- Knoppen ----------
+    def _handle_not_now(self):
+        if self._downloading:
+            # Lopende download afbreken; de worker ruimt het .part-bestand op
+            self._cancel.set()
+            logger.info("Update download cancelled by user")
+        self.grab_release()
+        self.destroy()
+
+    def _handle_update(self):
+        if self._downloaded_path:
+            self._open_download_folder()
+            return
+
+        if not self.asset:
+            logger.info("No downloadable release asset found, opening release page")
+            webbrowser.open(self.result["url"])
+            self._handle_not_now()
+            return
+
+        self._downloading = True
+        self._cancel.clear()
+        self.update_btn.config(state="disabled", text="Downloading...")
+        self.not_now_btn.config(text="Cancel")
+        self.progress["value"] = 0
+        self.progress_label.config(text="Connecting to GitHub...", foreground=COLOR_TEXT_MUTED)
+        self.progress_frame.pack(fill="x", padx=16, pady=(0, 16))
+        self._refit_height()
+
+        dest = os.path.join(_downloads_dir(), self.asset["name"])
+        logger.info(f"Downloading update {self.asset['name']} to {dest}")
+        threading.Thread(target=self._download_worker, args=(self.asset["url"], dest), daemon=True).start()
+
+    # ---------- Download ----------
+    def _download_worker(self, url, dest):
+        part = dest + ".part"
+        try:
+            with requests.get(url, stream=True, timeout=15) as resp:
+                resp.raise_for_status()
+                total = int(resp.headers.get("Content-Length", 0)) or self.asset.get("size", 0)
+                done = 0
+                with open(part, "wb") as f:
+                    for chunk in resp.iter_content(chunk_size=64 * 1024):
+                        if self._cancel.is_set():
+                            break
+                        f.write(chunk)
+                        done += len(chunk)
+                        self.after(0, self._on_progress, done, total)
+
+            if self._cancel.is_set():
+                os.remove(part)
+                return
+
+            os.replace(part, dest)
+            logger.info(f"Update downloaded: {dest}")
+            self.after(0, self._on_download_done, dest)
+        except (requests.RequestException, OSError) as e:
+            logger.error(f"Update download failed: {e}")
+            try:
+                if os.path.exists(part):
+                    os.remove(part)
+            except OSError:
+                pass
+            if not self._cancel.is_set():
+                self.after(0, self._on_download_failed, str(e))
+
+    def _on_progress(self, done, total):
+        if not self.winfo_exists():
+            return
+        if total:
+            self.progress["value"] = done * 100 / total
+            self.progress_label.config(text=f"{_format_size(done)} of {_format_size(total)}")
+        else:
+            self.progress_label.config(text=f"{_format_size(done)} downloaded")
+
+    def _on_download_done(self, dest):
+        if not self.winfo_exists():
+            return
+        self._downloading = False
+        self._downloaded_path = dest
+        self.progress["value"] = 100
+        self.progress_label.config(text=f"Saved to {dest}", foreground=COLOR_SUCCESS)
+        self.body_label.config(
+            text="Download complete. Close SimTim Terminal and install the new "
+                 "version from the downloaded file."
+        )
+        self.update_btn.config(state="normal", text="Open folder")
+        self.not_now_btn.config(text="Close")
+        self._refit_height()
+
+    def _on_download_failed(self, error):
+        if not self.winfo_exists():
+            return
+        self._downloading = False
+        self.progress_label.config(text=f"Download failed: {error}", foreground=COLOR_DANGER)
+        self.update_btn.config(state="normal", text="Retry")
+        self.not_now_btn.config(text="Not now")
+
+    def _open_download_folder(self):
+        path = self._downloaded_path
+        try:
+            if sys.platform == "win32":
+                # Opent Verkenner met het gedownloade bestand geselecteerd
+                subprocess.Popen(["explorer", "/select,", os.path.normpath(path)])
+            else:
+                webbrowser.open(os.path.dirname(path))
+        except OSError as e:
+            logger.error(f"Could not open download folder: {e}")
+        self._handle_not_now()

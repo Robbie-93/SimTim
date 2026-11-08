@@ -29,12 +29,24 @@ const SimRailAPI = {
         return await res.json();
     },
 
+    async getTrainDataWithStatus(server, trainNumber) {
+        const res = await this._fetchWithTimeout(
+            `/api/my_train_data?server=${server}&number=${trainNumber}`,
+            { cache: 'no-store' }
+        );
+        let data = null;
+        try {
+            data = await res.json();
+        } catch (e) {
+            data = { error: `Invalid response (HTTP ${res.status})` };
+        }
+        return { ok: res.ok, status: res.status, data };
+    },
+
     /* Health Check */
     async getSystemHealth(server, trainNumber) {
-        if (!trainNumber) return { error: "Geen actieve trein voor health check" };
-        const serverId = server || 'int1';
         const res = await this._fetchWithTimeout(
-            `/api/health?server_id=${serverId}&train_id=${trainNumber}`,
+            `/api/health?server_id=${server || ''}&train_id=${trainNumber || ''}`,
             { cache: 'no-store' }
         );
         return await res.json();
